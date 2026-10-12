@@ -1,0 +1,275 @@
+<% layout("/layouts/boilerplate") -%>
+
+<div class="index-container">
+    <!-- Hero Destination Search Bar Section -->
+    <section class="hero-search-wrapper mb-4" id="heroSearchSection">
+        <div class="hero-search-card shadow-sm border rounded-pill p-2 mx-auto">
+            <form action="/listings" method="GET" class="d-flex flex-column flex-md-row align-items-center justify-content-between g-2 w-100 search-form">
+                <!-- Where / Destination -->
+                <div class="search-field px-3 py-2 flex-grow-1 border-end-md">
+                    <label class="form-label text-xs text-uppercase fw-bold text-muted mb-0 d-block">Where</label>
+                    <input
+                        type="text"
+                        name="q"
+                        class="form-control border-0 p-0 shadow-none fw-semibold bg-transparent"
+                        placeholder="Search temples, churches, heritage monuments, Indian cities..."
+                        value="<%= searchQuery || '' %>"
+                    />
+                </div>
+
+                <!-- Check In -->
+                <div class="search-field px-3 py-2 border-end-md d-none d-lg-block">
+                    <label class="form-label text-xs text-uppercase fw-bold text-muted mb-0 d-block">Check In</label>
+                    <input
+                        type="date"
+                        name="checkIn"
+                        class="form-control border-0 p-0 shadow-none fw-semibold bg-transparent date-picker"
+                    />
+                </div>
+
+                <!-- Check Out -->
+                <div class="search-field px-3 py-2 border-end-md d-none d-lg-block">
+                    <label class="form-label text-xs text-uppercase fw-bold text-muted mb-0 d-block">Check Out</label>
+                    <input
+                        type="date"
+                        name="checkOut"
+                        class="form-control border-0 p-0 shadow-none fw-semibold bg-transparent date-picker"
+                    />
+                </div>
+
+                <!-- Who / Guests -->
+                <div class="search-field px-3 py-2 border-end-md">
+                    <label class="form-label text-xs text-uppercase fw-bold text-muted mb-0 d-block">Who</label>
+                    <input
+                        type="number"
+                        name="guests"
+                        min="1"
+                        max="20"
+                        class="form-control border-0 p-0 shadow-none fw-semibold bg-transparent"
+                        placeholder="Add guests"
+                        value="<%= guests || '' %>"
+                    />
+                </div>
+
+                <!-- Hidden category if active -->
+                <% if (activeCategory) { %>
+                    <input type="hidden" name="category" value="<%= activeCategory %>" />
+                <% } %>
+
+                <!-- Search Button -->
+                <div class="search-btn-col ps-2 pe-1">
+                    <button type="submit" class="btn btn-danger rounded-circle search-submit-btn shadow d-flex align-items-center justify-content-center" title="Search">
+                        <i class="fa-solid fa-magnifying-glass fs-6"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Category Filters Bar & Tax Switch -->
+    <div class="filters-bar-wrapper d-flex align-items-center justify-content-between mb-4 border-bottom pb-2">
+        <!-- Categories Carousel / Scroll -->
+        <div class="categories-scroll-container d-flex align-items-center gap-4 flex-grow-1 overflow-x-auto py-2 pe-3">
+            <a href="/listings<%= searchQuery ? '?q=' + encodeURIComponent(searchQuery) : '' %>"
+               class="category-item text-center text-decoration-none <%= !activeCategory ? 'active-category' : '' %>">
+                <div class="category-icon mb-1"><i class="fa-solid fa-border-all"></i></div>
+                <div class="category-title">All</div>
+            </a>
+
+            <% for (let cat of categories) { %>
+                <a href="/listings?category=<%= encodeURIComponent(cat.name) %><%= searchQuery ? '&q=' + encodeURIComponent(searchQuery) : '' %>"
+                   class="category-item text-center text-decoration-none <%= activeCategory === cat.name ? 'active-category' : '' %>">
+                    <div class="category-icon mb-1"><i class="fa-solid <%= cat.icon %>"></i></div>
+                    <div class="category-title"><%= cat.name %></div>
+                </a>
+            <% } %>
+        </div>
+
+        <!-- Filter Modal Trigger & Tax Toggle -->
+        <div class="d-none d-lg-flex align-items-center gap-3 ps-3 border-start">
+            <!-- Filter Options Button -->
+            <button class="btn btn-outline-secondary border rounded-4 d-flex align-items-center gap-2 px-3 py-2 small fw-semibold" data-bs-toggle="modal" data-bs-target="#filtersModal">
+                <i class="fa-solid fa-sliders"></i> Filters
+            </button>
+
+            <!-- Tax Toggle (Airbnb Feature) -->
+            <div class="tax-toggle-box border rounded-4 px-3 py-2 d-flex align-items-center gap-2">
+                <div class="form-check form-switch m-0 d-flex align-items-center gap-2">
+                    <input class="form-check-input mt-0" type="checkbox" role="switch" id="taxSwitch">
+                    <label class="form-check-label text-nowrap small fw-semibold text-secondary" for="taxSwitch">Display total after taxes (18%)</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Search/Filter Badges -->
+    <% if (searchQuery || activeCategory || minPrice || maxPrice || guests || selectedType) { %>
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-4">
+            <span class="small text-muted fw-semibold">Filtered by:</span>
+            <% if (searchQuery) { %>
+                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                    Query: "<%= searchQuery %>"
+                    <a href="/listings?<%= activeCategory ? 'category=' + encodeURIComponent(activeCategory) : '' %>" class="text-secondary ms-1 text-decoration-none">&times;</a>
+                </span>
+            <% } %>
+            <% if (activeCategory) { %>
+                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                    Category: <%= activeCategory %>
+                    <a href="/listings?<%= searchQuery ? 'q=' + encodeURIComponent(searchQuery) : '' %>" class="text-secondary ms-1 text-decoration-none">&times;</a>
+                </span>
+            <% } %>
+            <% if (minPrice || maxPrice) { %>
+                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                    Price: &#8377;<%= minPrice || 0 %> - &#8377;<%= maxPrice || '&infin;' %>
+                </span>
+            <% } %>
+            <% if (guests) { %>
+                <span class="badge bg-light text-dark border px-3 py-2 rounded-pill">
+                    Guests: <%= guests %>+
+                </span>
+            <% } %>
+            <a href="/listings" class="btn btn-link btn-sm text-danger text-decoration-none fw-semibold">Clear all</a>
+        </div>
+    <% } %>
+
+    <!-- Listings Grid -->
+    <% if (allListings.length === 0) { %>
+        <div class="text-center py-5 my-5 empty-listings-state">
+            <div class="mb-3 text-muted display-1">
+                <i class="fa-solid fa-umbrella-beach"></i>
+            </div>
+            <h3 class="fw-bold">No exact matches found</h3>
+            <p class="text-muted">Try changing or clearing your search filters to find available homes.</p>
+            <a href="/listings" class="btn btn-danger rounded-pill px-4 py-2 mt-2">View all listings</a>
+        </div>
+    <% } else { %>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 listings-grid">
+            <% for (let listing of allListings) { %>
+                <div class="col">
+                    <div class="card h-100 border-0 listing-card group">
+                        <!-- Image Container with Link -->
+                        <a href="/listings/<%= listing._id %>" class="text-decoration-none text-dark">
+                            <div class="position-relative overflow-hidden listing-img-wrapper rounded-4">
+                                <img
+                                    src="<%= listing.image && listing.image.url ? listing.image.url : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=1000&q=80' %>"
+                                    class="card-img-top listing-card-img"
+                                    alt="<%= listing.title %>"
+                                    loading="lazy"
+                                />
+                                
+                                <!-- Favorite Heart Icon -->
+                                <button class="btn position-absolute top-0 end-0 m-2 p-2 border-0 bg-transparent text-white heart-btn" type="button" onclick="event.preventDefault(); this.classList.toggle('favorited'); const i = this.querySelector('i'); if (i) { i.classList.toggle('fa-solid'); i.classList.toggle('fa-regular'); }" aria-label="Add to wishlist">
+                                    <i class="fa-regular fa-heart fs-5"></i>
+                                </button>
+
+                                <!-- Category Badge -->
+                                <% if (listing.category) { %>
+                                    <span class="badge position-absolute top-0 start-0 m-3 bg-dark bg-opacity-75 text-white rounded-pill px-3 py-1 small">
+                                        <%= listing.category %>
+                                    </span>
+                                <% } %>
+                            </div>
+
+                            <!-- Card Body -->
+                            <div class="card-body p-0 pt-3">
+                                <div class="d-flex justify-content-between align-items-baseline mb-1">
+                                    <h6 class="card-title fw-bold mb-0 text-truncate listing-card-title flex-grow-1 pe-2">
+                                        <%= listing.location %>, <%= listing.country %>
+                                    </h6>
+                                    
+                                    <!-- Rating -->
+                                    <div class="d-flex align-items-center gap-1 small fw-semibold text-nowrap">
+                                        <i class="fa-solid fa-star text-warning small"></i>
+                                        <span><%= Number(listing.avgRating) > 0 ? listing.avgRating : 'New' %></span>
+                                    </div>
+                                </div>
+
+                                <p class="text-muted small mb-1 text-truncate">
+                                    <%= listing.title %>
+                                </p>
+                                
+                                <p class="text-muted small mb-2">
+                                    <%= listing.accommodationType || 'Entire place' %> &middot; Up to <%= listing.maxGuests || 4 %> guests
+                                </p>
+
+                                <!-- Pricing -->
+                                <div class="d-flex align-items-baseline gap-1">
+                                    <span class="fw-bold fs-6 price-display" data-base-price="<%= listing.price %>">
+                                        &#8377; <%= Number(listing.price).toLocaleString("en-IN") %>
+                                    </span>
+                                    <span class="text-secondary small">/ night</span>
+                                    <span class="tax-info text-muted small ms-1 d-none">(incl. taxes)</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+</div>
+
+<!-- Filters Modal -->
+<div class="modal fade" id="filtersModal" tabindex="-1" aria-labelledby="filtersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="filtersModalLabel">Filters</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/listings" method="GET">
+                <div class="modal-body">
+                    <% if (searchQuery) { %>
+                        <input type="hidden" name="q" value="<%= searchQuery %>" />
+                    <% } %>
+                    <% if (activeCategory) { %>
+                        <input type="hidden" name="category" value="<%= activeCategory %>" />
+                    <% } %>
+
+                    <!-- Price Range -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Price range (per night)</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">&#8377;</span>
+                                    <input type="number" name="minPrice" class="form-control" placeholder="Minimum" value="<%= minPrice || '' %>">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">&#8377;</span>
+                                    <input type="number" name="maxPrice" class="form-control" placeholder="Maximum" value="<%= maxPrice || '' %>">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Property Type -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Property Type</label>
+                        <select name="type" class="form-select">
+                            <option value="">Any property type</option>
+                            <option value="Entire home" <%= selectedType === 'Entire home' ? 'selected' : '' %>>Entire home</option>
+                            <option value="Private room" <%= selectedType === 'Private room' ? 'selected' : '' %>>Private room</option>
+                            <option value="Villa" <%= selectedType === 'Villa' ? 'selected' : '' %>>Villa</option>
+                            <option value="Cabin" <%= selectedType === 'Cabin' ? 'selected' : '' %>>Cabin</option>
+                            <option value="Resort" <%= selectedType === 'Resort' ? 'selected' : '' %>>Resort</option>
+                        </select>
+                    </div>
+
+                    <!-- Guest Capacity -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Guests Capacity</label>
+                        <input type="number" name="guests" min="1" max="20" class="form-control" placeholder="Minimum guests (e.g. 2)" value="<%= guests || '' %>">
+                    </div>
+                </div>
+
+                <div class="modal-footer border-top d-flex justify-content-between">
+                    <a href="/listings" class="btn btn-outline-secondary rounded-pill px-3">Clear all</a>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-semibold">Show results</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

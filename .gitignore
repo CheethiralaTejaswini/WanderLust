@@ -1,0 +1,23 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Uploads
+uploads/*
+!uploads/.gitkeep
+uploads/temp_import/*
+!uploads/temp_import/.gitkeep
+
+# Operating system files
+.DS_Store
+Thumbs.db
+

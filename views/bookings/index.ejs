@@ -1,0 +1,87 @@
+<% layout("/layouts/boilerplate") -%>
+
+<div class="py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1">Your Reservations</h2>
+            <p class="text-muted small mb-0">View and manage all your accommodation bookings.</p>
+        </div>
+        <a href="/listings" class="btn btn-danger rounded-pill px-4">
+            <i class="fa-solid fa-compass me-1"></i> Explore Stays
+        </a>
+    </div>
+
+    <% if (bookings.length === 0) { %>
+        <div class="text-center py-5 bg-white rounded-4 border shadow-sm">
+            <i class="fa-regular fa-calendar-xmark fs-1 text-muted mb-3 d-block"></i>
+            <h4 class="fw-bold">No bookings found</h4>
+            <p class="text-muted">You haven't reserved any accommodation yet.</p>
+            <a href="/listings" class="btn btn-danger rounded-pill px-4 mt-2">Find a Place to Stay</a>
+        </div>
+    <% } else { %>
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            <% for (let b of bookings) { %>
+                <div class="col">
+                    <div class="card border rounded-4 shadow-sm h-100 overflow-hidden bg-white">
+                        <div class="row g-0 h-100">
+                            <div class="col-sm-5 position-relative">
+                                <img src="<%= b.listing && b.listing.image && b.listing.image.url ? b.listing.image.url : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80' %>"
+                                     class="img-fluid h-100 w-100" style="object-fit: cover; min-height: 200px;" alt="Listing">
+                                <span class="badge position-absolute top-0 start-0 m-2 <%= b.status === 'Confirmed' ? 'bg-success' : 'bg-secondary' %> rounded-pill px-3 py-1">
+                                    <%= b.status %>
+                                </span>
+                            </div>
+                            <div class="col-sm-7 p-3 d-flex flex-column justify-content-between">
+                                <div>
+                                    <h6 class="fw-bold mb-1 text-truncate"><%= b.listing ? b.listing.title : 'Listing' %></h6>
+                                    <p class="text-muted small mb-2"><i class="fa-solid fa-location-dot me-1 text-danger"></i> <%= b.listing ? b.listing.location : '' %></p>
+
+                                    <% if (b.listing && b.listing.owner) { %>
+                                        <% const hostObj = b.listing.owner; %>
+                                        <% const hName = hostObj.displayName || hostObj.username || 'Host'; %>
+                                        <% const hAvatar = (typeof getAvatarUrl === 'function') ? getAvatarUrl(hostObj, 60) : ''; %>
+                                        <% const hColor = (typeof getNameColor === 'function') ? getNameColor(hName) : '#FF385C'; %>
+                                        <% const hInitials = (typeof getInitials === 'function') ? getInitials(hName) : hName.charAt(0).toUpperCase(); %>
+                                        <div class="d-flex align-items-center gap-2 mb-2 p-1 px-2 bg-light rounded-pill border" style="width: fit-content;">
+                                            <% if (hAvatar) { %>
+                                                <img src="<%= hAvatar %>" alt="<%= hName %>" class="rounded-circle border" style="width: 22px; height: 22px; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none'); this.nextElementSibling.classList.add('d-flex');" />
+                                                <div class="rounded-circle text-white d-none align-items-center justify-content-center fw-bold" style="background-color: <%= hColor %>; width: 22px; height: 22px; font-size: 10px;">
+                                                    <%= hInitials %>
+                                                </div>
+                                            <% } else { %>
+                                                <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold" style="background-color: <%= hColor %>; width: 22px; height: 22px; font-size: 10px;">
+                                                    <%= hInitials %>
+                                                </div>
+                                            <% } %>
+                                            <span class="text-secondary small" style="font-size: 0.8rem;">Host: <strong class="text-dark"><%= hName %></strong></span>
+                                        </div>
+                                    <% } %>
+
+                                    <div class="bg-light p-2 rounded-3 small mb-2 border">
+                                        <div><strong>Dates:</strong> <%= new Date(b.checkIn).toLocaleDateString("en-IN", { month: "short", day: "numeric" }) %> &ndash; <%= new Date(b.checkOut).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }) %></div>
+                                        <div><strong>Duration:</strong> <%= b.totalNights %> nights &middot; <%= b.guests %> guests</div>
+                                        <div><strong>Code:</strong> <code><%= b.bookingCode %></code></div>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                    <div>
+                                        <span class="text-muted small">Total:</span>
+                                        <span class="fw-bold text-dark fs-6">&#8377;<%= Number(b.totalPrice).toLocaleString("en-IN") %></span>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <a href="/bookings/<%= b._id %>/confirmation" class="btn btn-outline-dark btn-sm rounded-pill px-3">Details</a>
+                                        <% if (b.status === "Confirmed") { %>
+                                            <form method="POST" action="/bookings/<%= b._id %>/cancel" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">Cancel</button>
+                                            </form>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+    <% } %>
+</div>

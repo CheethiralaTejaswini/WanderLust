@@ -1,0 +1,285 @@
+<% layout("/layouts/boilerplate") -%>
+
+<div class="row justify-content-center py-4">
+    <div class="col-12 col-md-10 col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+            <div class="mb-4">
+                <span class="badge bg-warning text-dark rounded-pill px-3 py-1 mb-2">
+                    <i class="fa-solid fa-taxi me-1"></i> Wanderlust Express Transfers
+                </span>
+                <h2 class="fw-bold mb-1">Book a Cab Transfer</h2>
+                <p class="text-muted small">
+                    Arrange comfortable, reliable rides to destinations, airports, and hotels with verified drivers and upfront rates.
+                </p>
+            </div>
+
+            <% if (listing) { %>
+                <div class="p-3 bg-light rounded-4 mb-4 border d-flex align-items-center gap-3">
+                    <img src="<%= listing.image?.url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80' %>"
+                         alt="Listing" class="rounded-3 shadow-sm" style="width: 70px; height: 70px; object-fit: cover;">
+                    <div>
+                        <span class="text-muted small text-uppercase fw-semibold">Destination Stay</span>
+                        <h6 class="fw-bold mb-0 text-truncate"><%= listing.title %></h6>
+                        <span class="text-muted small"><%= listing.location %>, <%= listing.country %></span>
+                    </div>
+                </div>
+            <% } %>
+
+            <form action="/cabs/book" method="POST" id="cabForm" novalidate class="needs-validation">
+                <% if (listing) { %>
+                    <input type="hidden" name="cabBooking[listingId]" value="<%= listing._id %>" />
+                <% } %>
+
+                <!-- Route: Pickup and Destination -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="pickupLocation" class="form-label fw-semibold">Pickup Location / City / Airport</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fa-solid fa-circle-dot text-success"></i></span>
+                            <input
+                                type="text"
+                                name="cabBooking[pickupLocation]"
+                                id="pickupLocation"
+                                class="form-control rounded-end-3"
+                                placeholder="e.g. Airport, Railway Station, City Center"
+                                value="<%= prefilledPickup || '' %>"
+                                required
+                            />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="dropoffLocation" class="form-label fw-semibold">Dropoff Destination</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fa-solid fa-location-dot text-danger"></i></span>
+                            <input
+                                type="text"
+                                name="cabBooking[dropoffLocation]"
+                                id="dropoffLocation"
+                                class="form-control rounded-end-3"
+                                placeholder="e.g. Hotel, Resort address"
+                                value="<%= prefilledDestination || '' %>"
+                                required
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date & Pickup Time -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="travelDate" class="form-label fw-semibold">Travel Date</label>
+                        <input
+                            type="date"
+                            name="cabBooking[travelDate]"
+                            id="travelDate"
+                            class="form-control rounded-3"
+                            value="<%= todayDate %>"
+                            min="<%= todayDate %>"
+                            required
+                        />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="pickupTime" class="form-label fw-semibold">Pickup Time</label>
+                        <input
+                            type="time"
+                            name="cabBooking[pickupTime]"
+                            id="pickupTime"
+                            class="form-control rounded-3"
+                            value="10:00"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <!-- Cab Type Selection with Rates -->
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Select Vehicle Type</label>
+                    <div class="row g-3">
+                        <div class="col-sm-6">
+                            <div class="border rounded-4 p-3 cab-type-card h-100 position-relative cursor-pointer selected-cab" data-type="Sedan Comfort">
+                                <input class="form-check-input position-absolute top-0 end-0 m-3" type="radio" name="cabBooking[cabType]" id="cabSedan" value="Sedan Comfort" checked>
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fa-solid fa-car-side fs-2 text-dark"></i>
+                                    <div>
+                                        <div class="fw-bold">Sedan Comfort</div>
+                                        <div class="text-muted small">Up to 4 seats &middot; AC &middot; Luggage</div>
+                                        <div class="fw-bold text-success small mt-1">&#8377;180 base + &#8377;16/km</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="border rounded-4 p-3 cab-type-card h-100 position-relative cursor-pointer" data-type="SUV Prime">
+                                <input class="form-check-input position-absolute top-0 end-0 m-3" type="radio" name="cabBooking[cabType]" id="cabSuv" value="SUV Prime">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fa-solid fa-van-shuttle fs-2 text-dark"></i>
+                                    <div>
+                                        <div class="fw-bold">SUV Prime</div>
+                                        <div class="text-muted small">Up to 6-7 seats &middot; Spacious</div>
+                                        <div class="fw-bold text-success small mt-1">&#8377;280 base + &#8377;22/km</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="border rounded-4 p-3 cab-type-card h-100 position-relative cursor-pointer" data-type="Economy Hatchback">
+                                <input class="form-check-input position-absolute top-0 end-0 m-3" type="radio" name="cabBooking[cabType]" id="cabHatchback" value="Economy Hatchback">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fa-solid fa-car fs-2 text-dark"></i>
+                                    <div>
+                                        <div class="fw-bold">Economy Hatchback</div>
+                                        <div class="text-muted small">Up to 4 seats &middot; Budget friendly</div>
+                                        <div class="fw-bold text-success small mt-1">&#8377;120 base + &#8377;12/km</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <div class="border rounded-4 p-3 cab-type-card h-100 position-relative cursor-pointer" data-type="Luxury Executive">
+                                <input class="form-check-input position-absolute top-0 end-0 m-3" type="radio" name="cabBooking[cabType]" id="cabLuxury" value="Luxury Executive">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="fa-solid fa-car-rear fs-2 text-dark"></i>
+                                    <div>
+                                        <div class="fw-bold">Luxury Executive</div>
+                                        <div class="text-muted small">Premium Sedan / Luxury &middot; VIP</div>
+                                        <div class="fw-bold text-success small mt-1">&#8377;500 base + &#8377;35/km</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Passengers & Phone -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="passengers" class="form-label fw-semibold">Number of Passengers</label>
+                        <select name="cabBooking[passengers]" id="passengers" class="form-select rounded-3">
+                            <option value="1">1 Passenger</option>
+                            <option value="2">2 Passengers</option>
+                            <option value="3">3 Passengers</option>
+                            <option value="4" selected>4 Passengers</option>
+                            <option value="5">5 Passengers</option>
+                            <option value="6">6 Passengers</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="contactPhone" class="form-label fw-semibold">Passenger Phone (for driver call)</label>
+                        <input
+                            type="tel"
+                            name="cabBooking[contactPhone]"
+                            id="contactPhone"
+                            class="form-control rounded-3"
+                            placeholder="+91 9876543210"
+                            value="<%= currUser && currUser.phone ? currUser.phone : '' %>"
+                            required
+                        />
+                    </div>
+                </div>
+
+                <!-- Driver Instructions -->
+                <div class="mb-4">
+                    <label for="driverNotes" class="form-label fw-semibold">Driver Notes (Optional)</label>
+                    <textarea name="cabBooking[driverNotes]" id="driverNotes" rows="2" class="form-control rounded-3" placeholder="Flight number, terminal details, or special landmark instructions..."></textarea>
+                </div>
+
+                <!-- Real-Time Fare Estimate Banner -->
+                <div class="card border rounded-4 p-3 bg-light mb-4 shadow-sm" id="fareEstimateCard">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="text-muted small text-uppercase fw-semibold d-block">Estimated Trip Fare</span>
+                            <div class="fs-3 fw-bold text-dark" id="estimatedFareText">&#8377;420</div>
+                            <span class="text-muted small" id="estimatedTripDetails">~15 km &middot; ~40 mins drive</span>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-2 small">
+                                <i class="fa-solid fa-lock me-1"></i> Fixed rate protection
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Direct Internal Booking + External Deep Link Options -->
+                <div class="d-flex flex-column gap-3">
+                    <button type="submit" class="btn btn-danger rounded-pill py-3 fw-bold fs-6 shadow-sm">
+                        <i class="fa-solid fa-check me-1"></i> Confirm Cab Booking (Pay in Cab)
+                    </button>
+
+                    <!-- Or Book via Uber / Ola official app links -->
+                    <div class="text-center position-relative my-2">
+                        <hr />
+                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted small fw-semibold">
+                            Or ride instantly via partner apps
+                        </span>
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <a id="uberDeepLink" href="https://m.uber.com/ul/" target="_blank" rel="noopener" class="btn btn-outline-dark w-100 rounded-pill py-2 small fw-semibold">
+                                <i class="fa-brands fa-uber me-1"></i> Open in Uber
+                            </a>
+                        </div>
+                        <div class="col-6">
+                            <a id="olaDeepLink" href="https://book.olacabs.com/" target="_blank" rel="noopener" class="btn btn-outline-success w-100 rounded-pill py-2 small fw-semibold">
+                                <i class="fa-solid fa-taxi me-1"></i> Open in Ola
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const pickupInput = document.getElementById("pickupLocation");
+        const dropoffInput = document.getElementById("dropoffLocation");
+        const fareText = document.getElementById("estimatedFareText");
+        const tripDetails = document.getElementById("estimatedTripDetails");
+        const uberLink = document.getElementById("uberDeepLink");
+        const radioButtons = document.querySelectorAll("input[name='cabBooking[cabType]']");
+
+        function updateEstimate() {
+            const pickup = pickupInput.value.trim();
+            const dropoff = dropoffInput.value.trim();
+            const selectedRadio = document.querySelector("input[name='cabBooking[cabType]']:checked");
+            const cabType = selectedRadio ? selectedRadio.value : "Sedan Comfort";
+
+            // Update deep links
+            if (dropoff) {
+                uberLink.href = "https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=" + encodeURIComponent(dropoff);
+            }
+
+            // Estimate distance
+            let combined = pickup + dropoff;
+            let hash = 0;
+            for (let i = 0; i < combined.length; i++) {
+                hash = (hash << 5) - hash + combined.charCodeAt(i);
+                hash |= 0;
+            }
+            const dist = Math.max(5, Math.min(80, (Math.abs(hash) % 40) + 8));
+
+            const rates = {
+                "Economy Hatchback": { base: 120, perKm: 12 },
+                "Sedan Comfort": { base: 180, perKm: 16 },
+                "SUV Prime": { base: 280, perKm: 22 },
+                "Luxury Executive": { base: 500, perKm: 35 }
+            };
+            const rate = rates[cabType] || rates["Sedan Comfort"];
+            const fare = Math.round(rate.base + (dist * rate.perKm));
+            const duration = Math.round(dist * 2.2 + 10);
+
+            fareText.innerText = "₹" + fare.toLocaleString("en-IN");
+            tripDetails.innerText = "~" + dist + " km · ~" + duration + " mins duration";
+        }
+
+        pickupInput.addEventListener("input", updateEstimate);
+        dropoffInput.addEventListener("input", updateEstimate);
+        radioButtons.forEach(r => r.addEventListener("change", updateEstimate));
+        updateEstimate();
+    });
+</script>

@@ -1,0 +1,580 @@
+/* ============================================================
+   WANDERLUST – AIRBNB-INSPIRED MODERN DESIGN SYSTEM
+============================================================ */
+
+:root {
+    --primary: #FF385C;
+    --primary-hover: #E00B41;
+    --primary-subtle: #FFF0F2;
+    --dark: #222222;
+    --muted: #717171;
+    --light-bg: #F7F7F7;
+    --border-color: #DDDDDD;
+    --border-light: #EBEBEB;
+    --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.12);
+    --border-radius-sm: 8px;
+    --border-radius-md: 14px;
+    --border-radius-lg: 24px;
+}
+
+body {
+    font-family: var(--font-main);
+    color: var(--dark);
+    background-color: #FFFFFF;
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================================
+   NAVBAR
+============================================================ */
+
+.main-navbar {
+    background-color: #FFFFFF !important;
+    border-bottom: 1px solid var(--border-light) !important;
+    z-index: 1030;
+}
+
+.brand-logo {
+    text-decoration: none;
+}
+
+.brand-icon {
+    color: var(--primary);
+    font-size: 1.8rem;
+    transition: transform 0.25s ease;
+}
+
+.brand-logo:hover .brand-icon {
+    transform: rotate(25deg);
+}
+
+.brand-text {
+    font-weight: 800;
+    font-size: 1.35rem;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+}
+
+.navbar-search-pill {
+    border: 1px solid var(--border-color);
+    border-radius: 40px;
+    padding: 6px 8px 6px 12px;
+    cursor: pointer;
+    background: #FFFFFF;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.navbar-search-pill:hover {
+    box-shadow: var(--shadow-md) !important;
+}
+
+.search-pill-segment {
+    font-size: 0.85rem;
+    color: var(--dark);
+}
+
+.search-pill-divider {
+    height: 22px;
+    width: 1px;
+    background-color: var(--border-color);
+}
+
+.search-pill-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    margin-left: 6px;
+}
+
+.host-link {
+    color: var(--dark) !important;
+    font-size: 0.9rem;
+    border-radius: 30px;
+    transition: background-color 0.2s ease;
+}
+
+.host-link:hover {
+    background-color: var(--light-bg);
+}
+
+.user-menu-pill {
+    border: 1px solid var(--border-color) !important;
+    border-radius: 30px !important;
+    padding: 5px 12px !important;
+    background-color: #FFFFFF !important;
+    transition: box-shadow 0.2s ease !important;
+}
+
+.user-menu-pill:hover {
+    box-shadow: var(--shadow-md) !important;
+}
+
+.user-avatar-img {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+}
+
+.user-avatar-placeholder {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.user-name-label {
+    max-width: 110px;
+    font-size: 0.85rem;
+}
+
+.user-dropdown-box {
+    min-width: 240px;
+    animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   HERO SEARCH SECTION
+============================================================ */
+
+.hero-search-wrapper {
+    max-width: 860px;
+    margin: 0 auto;
+}
+
+.hero-search-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border-color) !important;
+    transition: box-shadow 0.2s ease;
+}
+
+.hero-search-card:focus-within {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+.search-field {
+    min-width: 140px;
+    position: relative;
+    border-radius: 32px;
+    transition: background-color 0.15s ease;
+}
+
+.search-field:hover {
+    background-color: var(--light-bg);
+}
+
+.border-end-md {
+    border-right: 1px solid var(--border-light);
+}
+
+@media (max-width: 768px) {
+    .border-end-md {
+        border-right: none;
+        border-bottom: 1px solid var(--border-light);
+        width: 100%;
+    }
+    .hero-search-card {
+        border-radius: 20px !important;
+    }
+}
+
+.search-submit-btn {
+    width: 46px;
+    height: 46px;
+    background-color: var(--primary) !important;
+    border: none !important;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.search-submit-btn:hover {
+    background-color: var(--primary-hover) !important;
+    transform: scale(1.05);
+}
+
+/* ============================================================
+   CATEGORIES BAR
+============================================================ */
+
+.categories-scroll-container::-webkit-scrollbar {
+    display: none;
+}
+.categories-scroll-container {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.category-item {
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    min-width: max-content;
+    padding-bottom: 6px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    opacity: 0.75;
+}
+
+.category-item:hover {
+    color: var(--dark);
+    opacity: 1;
+    border-bottom-color: var(--muted);
+}
+
+.active-category {
+    color: var(--dark) !important;
+    opacity: 1 !important;
+    border-bottom-color: var(--dark) !important;
+}
+
+.category-icon {
+    font-size: 1.35rem;
+}
+
+/* ============================================================
+   LISTING CARDS
+============================================================ */
+
+.listing-card {
+    transition: transform 0.2s ease;
+}
+
+.listing-img-wrapper {
+    aspect-ratio: 20 / 19;
+    background-color: #EBEBEB;
+    border-radius: 14px;
+}
+
+.listing-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s ease;
+}
+
+.listing-card:hover .listing-card-img {
+    transform: scale(1.04);
+}
+
+.heart-btn {
+    z-index: 2;
+    transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.heart-btn:hover {
+    transform: scale(1.15);
+}
+
+.heart-btn.favorited i {
+    font-weight: 900;
+    color: var(--primary) !important;
+}
+
+.listing-card-title {
+    font-size: 0.95rem;
+}
+
+/* ============================================================
+   SHOW LISTING PAGE
+============================================================ */
+
+.show-container {
+    max-width: 1160px;
+    margin: 0 auto;
+}
+
+.show-listing-title {
+    font-size: 1.75rem;
+    letter-spacing: -0.5px;
+}
+
+.show-hero-image-wrapper {
+    height: 460px;
+    border-radius: 18px;
+    background-color: #EBEBEB;
+}
+
+.show-hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+@media (max-width: 768px) {
+    .show-hero-image-wrapper {
+        height: 280px;
+    }
+    .show-listing-title {
+        font-size: 1.4rem;
+    }
+}
+
+.host-img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+}
+
+.reviewer-avatar {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+}
+
+.booking-card-widget {
+    border-color: var(--border-color) !important;
+    border-radius: 18px !important;
+}
+
+.reserve-btn {
+    background-color: var(--primary) !important;
+    border: none !important;
+    transition: background-color 0.2s ease;
+}
+
+.reserve-btn:hover {
+    background-color: var(--primary-hover) !important;
+}
+
+/* ============================================================
+   CAB CARDS
+============================================================ */
+
+.cab-type-card {
+    transition: all 0.2s ease;
+    border: 2px solid var(--border-light) !important;
+}
+
+.cab-type-card:hover {
+    border-color: var(--primary) !important;
+    background-color: #FFFDFD;
+}
+
+.cab-type-card:has(input:checked) {
+    border-color: var(--dark) !important;
+    background-color: var(--light-bg);
+}
+
+/* ============================================================
+   BUTTONS & ALERTS
+============================================================ */
+
+.btn-danger {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+
+.btn-danger:hover {
+    background-color: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+}
+
+.modern-alert {
+    border-radius: 14px;
+    border: none;
+}
+
+/* ============================================================
+   STARABILITY RATING STYLES
+============================================================ */
+
+.starability-slot {
+    display: block;
+    position: relative;
+    width: 150px;
+    min-height: 30px;
+    padding: 0;
+    border: none;
+}
+
+.starability-slot > input {
+    position: absolute;
+    margin-right: -100%;
+    opacity: 0;
+}
+
+.starability-slot > input:checked ~ label,
+.starability-slot > input:focus ~ label {
+    background-position: 0 -30px;
+}
+
+.starability-slot > label {
+    position: relative;
+    float: right;
+    width: 30px;
+    height: 30px;
+    color: transparent;
+    cursor: pointer;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="60"><polygon points="15,1 19,10 29,11 22,18 24,28 15,23 6,28 8,18 1,11 11,10" fill="%23FFB800"/><polygon points="15,31 19,40 29,41 22,48 24,58 15,53 6,58 8,48 1,41 11,40" fill="%23CCCCCC"/></svg>');
+    background-repeat: no-repeat;
+    background-position: 0 0;
+}
+
+.starability-result {
+    position: relative;
+    width: 100px;
+    height: 20px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="40"><polygon points="10,1 12.5,7 19,7.5 14.5,12 16,18.5 10,15 4,18.5 5.5,12 1,7.5 7.5,7" fill="%23FFB800"/><polygon points="10,21 12.5,27 19,27.5 14.5,32 16,38.5 10,35 4,38.5 5.5,32 1,27.5 7.5,27" fill="%23E0E0E0"/></svg>');
+    background-repeat: repeat-x;
+    background-position: 0 -20px;
+    margin: 0;
+}
+
+.starability-result[data-rating="1"] { width: 20px; background-position: 0 0; }
+.starability-result[data-rating="2"] { width: 40px; background-position: 0 0; }
+.starability-result[data-rating="3"] { width: 60px; background-position: 0 0; }
+.starability-result[data-rating="4"] { width: 80px; background-position: 0 0; }
+.starability-result[data-rating="5"] { width: 100px; background-position: 0 0; }
+
+/* ============================================================
+   FOOTER
+============================================================ */
+
+.main-footer {
+    border-top: 1px solid var(--border-light) !important;
+    background-color: #F7F7F7 !important;
+}
+
+.footer-link {
+    color: var(--dark);
+    text-decoration: none;
+}
+
+.footer-link:hover {
+    text-decoration: underline;
+}
+
+.footer-social-link {
+    color: var(--dark);
+    transition: color 0.2s ease;
+}
+
+.footer-social-link:hover {
+    color: var(--primary);
+}
+
+/* ============================================================
+   INTERACTIVE MAP & LEAFLET STYLING
+============================================================ */
+.map-canvas-container {
+    height: 420px;
+    width: 100%;
+    position: relative;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    background-color: #f1f3f5;
+}
+
+.wanderlust-pin-container {
+    background: transparent !important;
+    border: none !important;
+}
+
+.wanderlust-map-pin {
+    position: relative;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wanderlust-map-pin .pin-radar {
+    position: absolute;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 56, 92, 0.25);
+    animation: mapPulse 2s ease-out infinite;
+}
+
+.wanderlust-map-pin .pin-icon {
+    position: relative;
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    background: #FF385C;
+    color: #FFFFFF;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 4px 12px rgba(255, 56, 92, 0.5), 0 2px 4px rgba(0, 0, 0, 0.15);
+    border: 2.5px solid #FFFFFF;
+    transition: transform 0.2s ease;
+}
+
+.wanderlust-map-pin:hover .pin-icon {
+    transform: scale(1.15);
+    background: #E00B41;
+}
+
+@keyframes mapPulse {
+    0% {
+        transform: scale(0.6);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(1.6);
+        opacity: 0;
+    }
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: 16px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.leaflet-popup-content {
+    margin: 0 !important;
+    line-height: 1.4 !important;
+    width: 240px !important;
+}
+
+.map-popup-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.map-popup-img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
+
+.map-badge-overlay {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    border-radius: 30px;
+    padding: 6px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #495057;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+}

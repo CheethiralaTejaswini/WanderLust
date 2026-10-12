@@ -1,0 +1,56 @@
+<% layout("/layouts/boilerplate") -%>
+
+<div class="row justify-content-center py-4">
+    <div class="col-12 col-md-8 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-white">
+            <div class="text-center mb-4">
+                <div class="d-inline-flex p-3 rounded-circle bg-danger-subtle text-danger mb-3">
+                    <i class="fa-regular fa-comment-dots fs-2"></i>
+                </div>
+                <h3 class="fw-bold mb-1">Feedback & Support</h3>
+                <p class="text-muted small">Share your thoughts, suggestions, or report any issues with Wanderlust.</p>
+            </div>
+
+            <form action="/feedback" method="POST" novalidate class="needs-validation">
+                <div class="mb-3">
+                    <label for="name" class="form-label fw-semibold">Your Name</label>
+                    <input type="text" name="feedback[name]" id="name" class="form-control rounded-3" value="<%= currUser ? (currUser.displayName || currUser.username) : '' %>" required placeholder="Enter your full name">
+                    <div class="invalid-feedback">Please enter your name.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-semibold">Email Address</label>
+                    <input type="email" name="feedback[email]" id="email" class="form-control rounded-3" value="<%= currUser ? currUser.email : '' %>" required placeholder="name@example.com">
+                    <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="category" class="form-label fw-semibold">Feedback Category</label>
+                    <select name="feedback[category]" id="category" class="form-select rounded-3">
+                        <option value="General Suggestion">General Suggestion</option>
+                        <option value="Bug Report">Bug Report</option>
+                        <option value="Feature Request">Feature Request</option>
+                        <option value="Booking Support">Booking Support</option>
+                        <option value="Host Inquiry">Host Inquiry</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label for="subject" class="form-label fw-semibold">Subject</label>
+                    <input type="text" name="feedback[subject]" id="subject" class="form-control rounded-3" required placeholder="Brief summary of your feedback">
+                    <div class="invalid-feedback">Please provide a subject.</div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="message" class="form-label fw-semibold">Your Message / Suggestion</label>
+                    <textarea name="feedback[message]" id="message" rows="4" class="form-control rounded-3" required placeholder="Please describe your experience or suggestions in detail..."></textarea>
+                    <div class="invalid-feedback">Please write your feedback message.</div>
+                </div>
+
+                <button type="submit" class="btn btn-danger rounded-pill w-100 py-3 fw-bold">
+                    Submit Feedback
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,312 @@
+const sampleListings = [
+  {
+    title: "Gateway of India Luxury Suite",
+    description: "Stay opposite the historic Gateway of India and the iconic Arabian Sea harbor. Experience vintage elegance and panoramic marine views in Mumbai.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 3200,
+    location: "Colaba, Mumbai, Maharashtra",
+    country: "India",
+  },
+  {
+    title: "Golden Temple Divine Heritage Stay",
+    description: "Immerse yourself in peace and spirituality just steps from the holy Golden Temple (Sri Harmandir Sahib). Enjoy sacred hymns, langar, and evening illumination.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1595846519845-68e298c2edd8?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 1800,
+    location: "Amritsar, Punjab",
+    country: "India",
+  },
+  {
+    title: "Taj Mahal Monumental View Villa",
+    description: "Witness the breathtaking marble domes of the world-famous Taj Mahal right from your terrace at sunrise. Luxury royal hospitality in Agra.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 4500,
+    location: "Agra, Uttar Pradesh",
+    country: "India",
+  },
+  {
+    title: "Kashi Vishwanath Ganges Ghat Sanctuary",
+    description: "Overlook the sacred Ganga ghats and attend the enchanting evening Maha Aarti. Walking distance to the revered Kashi Vishwanath Jyotirlinga temple.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2100,
+    location: "Varanasi, Uttar Pradesh",
+    country: "India",
+  },
+  {
+    title: "Hawa Mahal Palace of Winds Haveli",
+    description: "Live amidst Rajasthan royal glory overlooking the famous pink honeycomb facades of Hawa Mahal and Amber Fort.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2800,
+    location: "Jaipur, Rajasthan",
+    country: "India",
+  },
+  {
+    title: "Basilica of Bom Jesus Heritage Villa",
+    description: "Located near the UNESCO World Heritage Basilica of Bom Jesus and Se Cathedral in Old Goa. Portuguese baroque architecture surrounded by palm groves.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 3500,
+    location: "Old Goa, Goa",
+    country: "India",
+  },
+  {
+    title: "Christ Church Ridge Colonial Estate",
+    description: "Wake up to misty Himalayan views and the yellow bell tower of historic Christ Church on Shimla's Ridge, built in 1857 in neo-Gothic style.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1626784215021-2e39ccf971cd?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2600,
+    location: "The Ridge, Shimla, Himachal Pradesh",
+    country: "India",
+  },
+  {
+    title: "City Palace Lake Pichola Royal Heritage",
+    description: "A fairy-tale palace stay overlooking the sparkling waters of Lake Pichola and the majestic City Palace of Udaipur.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1596178065887-1198b6148b2b?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 4800,
+    location: "Udaipur, Rajasthan",
+    country: "India",
+  },
+  {
+    title: "Meenakshi Amman Temple Sacred Residency",
+    description: "Experience the architectural marvel of ancient India with towering multicolored gopurams of the sacred Meenakshi Temple in Madurai.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 1900,
+    location: "Madurai, Tamil Nadu",
+    country: "India",
+  },
+  {
+    title: "Mysore Palace Royal Heritage Retreat",
+    description: "Stay in the City of Palaces near the illuminated Mysore Palace, home to grand arches, durbar halls, and royal gardens.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1590050752117-238cb0fb12b1?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 3100,
+    location: "Mysuru, Karnataka",
+    country: "India",
+  },
+  {
+    title: "Hampi Virupaksha Stone Chariot Camp",
+    description: "Explore the UNESCO World Heritage ruins of the Vijayanagara Empire, ancient stone chariot, and the active Virupaksha Temple.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2200,
+    location: "Hampi, Karnataka",
+    country: "India",
+  },
+  {
+    title: "Brihadeeswara Great Living Chola Temple Stay",
+    description: "Marvel at the 1,000-year-old granite temple tower built by Raja Raja Chola I. Unmatched spiritual heritage and Dravidian architecture.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1621682372775-533449e550ed?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 1750,
+    location: "Thanjavur, Tamil Nadu",
+    country: "India",
+  },
+  {
+    title: "Rishikesh Holy Ganga Spiritual Retreat",
+    description: "Yoga and meditation sanctuary on the emerald banks of the holy Ganges river, nestled at the foothills of the Himalayas in Rishikesh.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1506461883276-594a12b11cf3?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2000,
+    location: "Rishikesh, Uttarakhand",
+    country: "India",
+  },
+  {
+    title: "India Gate Central Capital Suite",
+    description: "Minutes from the illuminated triumphal arch of India Gate, Kartavya Path, and National Museum in the historic heart of New Delhi.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1587474260584-136574528ed5?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 3600,
+    location: "New Delhi, Delhi",
+    country: "India",
+  },
+  {
+    title: "Charminar Nizami Heritage Suite",
+    description: "Stay beside the 430-year-old monument with four grand minarets, vibrant bazaars, and legendary Nizami delicacies in Hyderabad.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1572953109213-3be62398eb95?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2400,
+    location: "Old City, Hyderabad, Telangana",
+    country: "India",
+  },
+  {
+    title: "Konark Sun Temple Coastal Haven",
+    description: "Experience the monumental stone wheels and celestial carvings of the 13th-century Konark Sun Temple by Chandrabhaga Beach.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1608958435020-e8a7109ba809?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 1850,
+    location: "Konark, Odisha",
+    country: "India",
+  },
+  {
+    title: "Jaisalmer Golden Fort Desert Haveli",
+    description: "Perched within the living sandstone ramparts of Sonar Qila (Golden Fort) with intricately carved Jain temples and golden sunset terraces.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1597040663342-45b6af3d91a5?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2700,
+    location: "Jaisalmer, Rajasthan",
+    country: "India",
+  },
+  {
+    title: "Rameswaram Temple Sacred Shore Resort",
+    description: "Famous for its magnificent third corridor with over 1,200 carved pillars and 22 holy water theerthams right by the Indian Ocean.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2150,
+    location: "Rameswaram, Tamil Nadu",
+    country: "India",
+  },
+  {
+    title: "Sacred Heart Church French Quarter Villa",
+    description: "Charming Franco-Tamil villa walking distance from the iconic Gothic revival Basilica of the Sacred Heart of Jesus and Promenade Beach.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2900,
+    location: "White Town, Pondicherry",
+    country: "India",
+  },
+  {
+    title: "St. Paul's Cathedral Colonial Suite",
+    description: "A prestigious stay next to the Gothic revival St. Paul's Cathedral and Victoria Memorial surrounded by expansive green maidans.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1558431382-27e303142255?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 3300,
+    location: "Kolkata, West Bengal",
+    country: "India",
+  },
+  {
+    title: "Munnar Christ Church Valley Chalet",
+    description: "Nestled in rolling tea hills near the historic stone-built CSI Christ Church (established in 1910) amidst misty mountain breezes.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2400,
+    location: "Munnar, Kerala",
+    country: "India",
+  },
+  {
+    title: "Alleppey Backwaters Heritage Lotus Villa",
+    description: "Traditional wooden Kerala architecture by tranquil lagoons and ancient canal-side temples in the Venice of the East.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2750,
+    location: "Alleppey, Kerala",
+    country: "India",
+  },
+  {
+    title: "Vivekananda Rock Oceanfront Retreat",
+    description: "Where three oceans meet! Direct views of the sacred Vivekananda Rock Memorial, Thiruvalluvar Statue, and Kumari Amman Temple.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2250,
+    location: "Kanyakumari, Tamil Nadu",
+    country: "India",
+  },
+  {
+    title: "Kedarnath Holy Mountain Lodge",
+    description: "A sacred mountain retreat surrounded by snow-clad Himalayan peaks near the revered ancient Kedarnath Temple.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1589182373726-e4f658ab50f0?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 1950,
+    location: "Kedarnath, Uttarakhand",
+    country: "India",
+  },
+  {
+    title: "Mahabodhi Temple Enlightenment Resort",
+    description: "Serene spiritual retreat situated steps away from the UNESCO World Heritage Mahabodhi Temple and the sacred Bodhi Tree.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 1800,
+    location: "Bodh Gaya, Bihar",
+    country: "India",
+  },
+  {
+    title: "Hadimba Temple Cedar Forest Retreat",
+    description: "Surrounded by towering deodar pine trees near the 16th-century wooden pagoda Hadimba Devi Temple in Old Manali.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1626784215021-2e39ccf971cd?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2100,
+    location: "Manali, Himachal Pradesh",
+    country: "India",
+  },
+  {
+    title: "Gokarna Sacred Temple & Coast Haven",
+    description: "A tranquil coastal villa walking distance from the ancient Atmalinga Mahabaleshwar Temple and the cliffs of Om Beach.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2300,
+    location: "Gokarna, Karnataka",
+    country: "India",
+  },
+  {
+    title: "Somnath Temple Sacred Shoreline Stay",
+    description: "Uninterrupted views of the Arabian Sea and the eternal Somnath Temple, the first of the twelve sacred Jyotirlingas of India.",
+    image: {
+      filename: "listingimage",
+      url: "https://images.unsplash.com/photo-1608958435020-e8a7109ba809?auto=format&fit=crop&w=1200&q=80",
+    },
+    price: 2500,
+    location: "Somnath, Gujarat",
+    country: "India",
+  }
+];
+
+module.exports = { data: sampleListings };

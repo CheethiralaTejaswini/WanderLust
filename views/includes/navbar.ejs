@@ -1,0 +1,152 @@
+<nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top py-2 main-navbar">
+    <div class="container-fluid px-lg-5 px-3">
+        <!-- Brand Logo -->
+        <a class="navbar-brand d-flex align-items-center gap-2 brand-logo" href="/listings">
+            <div class="brand-icon">
+                <i class="fa-solid fa-compass"></i>
+            </div>
+            <span class="brand-text">wanderlust</span>
+        </a>
+
+        <!-- Compact Search Pill (Airbnb Style) -->
+        <a class="d-none d-md-flex align-items-center navbar-search-pill shadow-sm text-decoration-none text-dark" href="/listings#heroSearchSection" role="button">
+            <span class="search-pill-segment px-3 fw-semibold">Anywhere</span>
+            <span class="search-pill-divider"></span>
+            <span class="search-pill-segment px-3 fw-semibold">Any week</span>
+            <span class="search-pill-divider"></span>
+            <span class="search-pill-segment px-3 text-muted">Add guests</span>
+            <div class="search-pill-btn">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+        </a>
+
+        <!-- Mobile Toggler -->
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavMain" aria-controls="navbarNavMain" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Right Side Nav Items -->
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNavMain">
+            <ul class="navbar-nav align-items-lg-center gap-lg-2 mt-3 mt-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold px-3 host-link" href="/listings">
+                        <i class="fa-solid fa-compass me-1 text-danger"></i> Explore
+                    </a>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold px-3 host-link" href="/listings/new">
+                        <i class="fa-solid fa-plus me-1 text-danger"></i> Airbnb your home
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link fw-semibold px-3 host-link" href="/cabs/book">
+                        <i class="fa-solid fa-taxi me-1 text-warning"></i> Book a Cab
+                    </a>
+                </li>
+
+                <% if (typeof currUser !== "undefined" && currUser) { %>
+                    <!-- Logged In User Dropdown -->
+                    <li class="nav-item dropdown ms-lg-2">
+                        <button class="btn user-menu-pill shadow-sm dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-bars text-secondary fs-6"></i>
+                            <% const userName = currUser.displayName || currUser.username; %>
+                            <% const userAvatarUrl = (typeof getAvatarUrl === "function") ? getAvatarUrl(currUser) : (currUser.avatar || ""); %>
+                            <% const userColor = (typeof getNameColor === "function") ? getNameColor(userName) : "#FF385C"; %>
+                            <% const userInitials = (typeof getInitials === "function") ? getInitials(userName) : userName.charAt(0).toUpperCase(); %>
+
+                            <% if (userAvatarUrl) { %>
+                                <img src="<%= userAvatarUrl %>" alt="<%= userName %>" class="user-avatar-img rounded-circle border" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none'); this.nextElementSibling.classList.add('d-flex');" />
+                                <div class="user-avatar-placeholder rounded-circle text-white d-none align-items-center justify-content-center fw-bold shadow-sm" style="background-color: <%= userColor %>; width: 32px; height: 32px; font-size: 13px;">
+                                    <%= userInitials %>
+                                </div>
+                            <% } else { %>
+                                <div class="user-avatar-placeholder rounded-circle text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="background-color: <%= userColor %>; width: 32px; height: 32px; font-size: 13px;">
+                                    <%= userInitials %>
+                                </div>
+                            <% } %>
+                            <span class="d-none d-lg-inline fw-semibold text-truncate user-name-label"><%= userName %></span>
+                        </button>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 p-2 mt-2 user-dropdown-box">
+                            <li class="px-3 py-2 border-bottom mb-1">
+                                <div class="d-flex align-items-center gap-2">
+                                    <img src="<%= userAvatarUrl %>" alt="<%= userName %>" class="rounded-circle border flex-shrink-0" style="width: 38px; height: 38px; object-fit: cover;" onerror="this.style.display='none';" />
+                                    <div class="overflow-hidden">
+                                        <div class="fw-bold text-dark text-truncate"><%= userName %></div>
+                                        <div class="text-muted small text-truncate"><%= currUser.email %></div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 rounded-2" href="/profile">
+                                    <i class="fa-regular fa-user me-2 text-danger"></i> My Dashboard & Profile
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 rounded-2" href="/bookings">
+                                    <i class="fa-regular fa-calendar-check me-2 text-primary"></i> My Reservations
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 rounded-2" href="/profile#cabs">
+                                    <i class="fa-solid fa-taxi me-2 text-warning"></i> My Cab Rides
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 rounded-2" href="/listings/new">
+                                    <i class="fa-solid fa-house-chimney me-2 text-success"></i> Create Listing
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 rounded-2 text-danger fw-semibold" href="/admin/bulk-import">
+                                    <i class="fa-solid fa-file-import me-2"></i> Bulk Import & Export
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 rounded-2" href="/feedback">
+                                    <i class="fa-regular fa-message me-2 text-info"></i> Send Feedback / Help
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item py-2 rounded-2 text-danger fw-semibold" href="/logout">
+                                    <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Log out
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                <% } else { %>
+                    <!-- Guest Dropdown -->
+                    <li class="nav-item dropdown ms-lg-2">
+                        <button class="btn user-menu-pill shadow-sm dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-bars text-secondary fs-6"></i>
+                            <div class="user-avatar-placeholder rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center">
+                                <i class="fa-solid fa-user fs-6"></i>
+                            </div>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 p-2 mt-2 user-dropdown-box">
+                            <li>
+                                <a class="dropdown-item py-2 rounded-2 fw-semibold text-danger" href="/signup">
+                                    <i class="fa-solid fa-user-plus me-2"></i> Sign up
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item py-2 rounded-2 fw-semibold" href="/login">
+                                    <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Log in
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item py-2 rounded-2 text-muted" href="/feedback">
+                                    <i class="fa-regular fa-circle-question me-2"></i> Help Center & Feedback
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</nav>

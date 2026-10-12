@@ -1,0 +1,326 @@
+<% layout("/layouts/boilerplate") -%>
+
+<div class="profile-dashboard-container py-3">
+    <!-- Profile Header Card -->
+    <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-white">
+        <div class="row align-items-center gy-3">
+            <% const profileName = user.displayName || user.username; %>
+            <% const profileAvatarUrl = (typeof getAvatarUrl === "function") ? getAvatarUrl(user, 200) : (user.avatar || ""); %>
+            <% const profileColor = (typeof getNameColor === "function") ? getNameColor(profileName) : "#FF385C"; %>
+            <% const profileInitials = (typeof getInitials === "function") ? getInitials(profileName) : profileName.charAt(0).toUpperCase(); %>
+
+            <div class="col-auto">
+                <% if (profileAvatarUrl) { %>
+                    <img src="<%= profileAvatarUrl %>" alt="<%= profileName %>" class="rounded-circle shadow profile-avatar-large border" style="width: 90px; height: 90px; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none'); this.nextElementSibling.classList.add('d-flex');" />
+                    <div class="rounded-circle text-white d-none align-items-center justify-content-center shadow profile-avatar-large fw-bold" style="background-color: <%= profileColor %>; width: 90px; height: 90px; font-size: 2.2rem;">
+                        <%= profileInitials %>
+                    </div>
+                <% } else { %>
+                    <div class="rounded-circle text-white d-flex align-items-center justify-content-center shadow profile-avatar-large fw-bold" style="background-color: <%= profileColor %>; width: 90px; height: 90px; font-size: 2.2rem;">
+                        <%= profileInitials %>
+                    </div>
+                <% } %>
+            </div>
+
+            <div class="col">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                    <h3 class="fw-bold mb-0 text-dark"><%= user.displayName || user.username %></h3>
+                    <% if (user.googleId) { %>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">
+                            <i class="fa-brands fa-google me-1"></i> Google Verified
+                        </span>
+                    <% } %>
+                </div>
+                <p class="text-muted small mb-2"><i class="fa-regular fa-envelope me-1"></i> <%= user.email %></p>
+                <div class="d-flex flex-wrap gap-3 small text-secondary">
+                    <span><i class="fa-solid fa-house-chimney me-1 text-danger"></i> <%= myListings.length %> Listings</span>
+                    <span><i class="fa-solid fa-calendar-check me-1 text-primary"></i> <%= myBookings.length %> Reservations</span>
+                    <span><i class="fa-solid fa-taxi me-1 text-warning"></i> <%= myCabs.length %> Cab Rides</span>
+                    <span><i class="fa-solid fa-star me-1 text-warning"></i> <%= myReviews.length %> Reviews</span>
+                </div>
+            </div>
+
+            <div class="col-md-auto d-flex flex-wrap align-items-center gap-2">
+                <a href="/admin/bulk-import" class="btn btn-danger rounded-pill px-3 shadow-sm">
+                    <i class="fa-solid fa-file-import me-1"></i> Bulk Import & Export
+                </a>
+                <button class="btn btn-outline-dark rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                    <i class="fa-solid fa-pen me-1"></i> Edit Profile
+                </button>
+                <form action="/admin/toggle-admin" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm <%= user.role === 'admin' ? 'btn-success' : 'btn-outline-secondary' %> rounded-pill px-3" title="Click to toggle Admin / User role">
+                        <i class="fa-solid <%= user.role === 'admin' ? 'fa-shield-halved' : 'fa-user' %> me-1"></i> Role: <%= user.role ? user.role.toUpperCase() : 'USER' %>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Navigation Tabs -->
+    <ul class="nav nav-pills dashboard-nav-tabs mb-4 p-1 bg-light rounded-pill border" id="profileTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active rounded-pill px-4 fw-semibold" id="reservations-tab" data-bs-toggle="pill" data-bs-target="#reservations" type="button" role="tab" aria-controls="reservations" aria-selected="true">
+                <i class="fa-regular fa-calendar-check me-1"></i> My Bookings (<%= myBookings.length %>)
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4 fw-semibold" id="listings-tab" data-bs-toggle="pill" data-bs-target="#listings" type="button" role="tab" aria-controls="listings" aria-selected="false">
+                <i class="fa-solid fa-house-chimney me-1"></i> My Listings (<%= myListings.length %>)
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4 fw-semibold" id="cabs-tab" data-bs-toggle="pill" data-bs-target="#cabs" type="button" role="tab" aria-controls="cabs" aria-selected="false">
+                <i class="fa-solid fa-taxi me-1"></i> Cab Bookings (<%= myCabs.length %>)
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4 fw-semibold" id="reviews-tab" data-bs-toggle="pill" data-bs-target="#reviews" type="button" role="tab" aria-controls="reviews" aria-selected="false">
+                <i class="fa-regular fa-star me-1"></i> My Reviews (<%= myReviews.length %>)
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab Contents -->
+    <div class="tab-content" id="profileTabsContent">
+        <!-- Tab 1: Accommodation Bookings -->
+        <div class="tab-pane fade show active" id="reservations" role="tabpanel" aria-labelledby="reservations-tab">
+            <% if (myBookings.length === 0) { %>
+                <div class="text-center py-5 bg-white rounded-4 border">
+                    <i class="fa-regular fa-calendar-xmark fs-1 text-muted mb-3 d-block"></i>
+                    <h5 class="fw-bold">No reservations yet</h5>
+                    <p class="text-muted small">Time to dust off your bags and start planning your next great adventure.</p>
+                    <a href="/listings" class="btn btn-danger rounded-pill px-4">Start exploring</a>
+                </div>
+            <% } else { %>
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    <% for (let b of myBookings) { %>
+                        <div class="col">
+                            <div class="card border rounded-4 shadow-sm h-100 overflow-hidden bg-white">
+                                <div class="row g-0 h-100">
+                                    <div class="col-sm-5 position-relative">
+                                        <img src="<%= b.listing && b.listing.image && b.listing.image.url ? b.listing.image.url : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80' %>"
+                                             class="img-fluid h-100 w-100" style="object-fit: cover; min-height: 180px;" alt="Listing">
+                                        <span class="badge position-absolute top-0 start-0 m-2 <%= b.status === 'Confirmed' ? 'bg-success' : 'bg-secondary' %> rounded-pill px-3 py-1">
+                                            <%= b.status %>
+                                        </span>
+                                    </div>
+                                    <div class="col-sm-7 p-3 d-flex flex-column justify-content-between">
+                                        <div>
+                                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                                <h6 class="fw-bold mb-0 text-truncate">
+                                                    <%= b.listing ? b.listing.title : 'Listing' %>
+                                                </h6>
+                                            </div>
+                                            <p class="text-muted small mb-2">
+                                                <i class="fa-solid fa-location-dot me-1 text-danger"></i>
+                                                <%= b.listing ? b.listing.location : '' %>
+                                            </p>
+                                            <div class="bg-light p-2 rounded-3 small mb-2 border">
+                                                <div><strong>Check-in:</strong> <%= new Date(b.checkIn).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }) %></div>
+                                                <div><strong>Check-out:</strong> <%= new Date(b.checkOut).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }) %></div>
+                                                <div><strong>Guests:</strong> <%= b.guests %> &middot; <strong>Code:</strong> <code><%= b.bookingCode %></code></div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                                            <div>
+                                                <span class="text-muted small">Total:</span>
+                                                <span class="fw-bold text-dark fs-6">&#8377;<%= Number(b.totalPrice).toLocaleString("en-IN") %></span>
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                <a href="/bookings/<%= b._id %>/confirmation" class="btn btn-outline-dark btn-sm rounded-pill px-3">Receipt</a>
+                                                <% if (b.status === "Confirmed") { %>
+                                                    <form method="POST" action="/bookings/<%= b._id %>/cancel" onsubmit="return confirm('Cancel this reservation?');">
+                                                        <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">Cancel</button>
+                                                    </form>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Tab 2: User's Listings -->
+        <div class="tab-pane fade" id="listings" role="tabpanel" aria-labelledby="listings-tab">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Listings you manage</h5>
+                <a href="/listings/new" class="btn btn-danger rounded-pill px-3 py-1 btn-sm fw-semibold">
+                    <i class="fa-solid fa-plus me-1"></i> Add New Listing
+                </a>
+            </div>
+
+            <% if (myListings.length === 0) { %>
+                <div class="text-center py-5 bg-white rounded-4 border">
+                    <i class="fa-solid fa-house-chimney-window fs-1 text-muted mb-3 d-block"></i>
+                    <h5 class="fw-bold">You haven't listed any properties yet</h5>
+                    <p class="text-muted small">Become a host and earn extra income by sharing your space.</p>
+                    <a href="/listings/new" class="btn btn-danger rounded-pill px-4">Create your first listing</a>
+                </div>
+            <% } else { %>
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                    <% for (let l of myListings) { %>
+                        <div class="col">
+                            <div class="card h-100 border rounded-4 shadow-sm overflow-hidden bg-white">
+                                <img src="<%= l.image?.url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80' %>"
+                                     class="card-img-top" style="height: 180px; object-fit: cover;" alt="<%= l.title %>">
+                                <div class="card-body p-3">
+                                    <h6 class="fw-bold mb-1 text-truncate"><%= l.title %></h6>
+                                    <p class="text-muted small mb-2"><%= l.location %>, <%= l.country %></p>
+                                    <div class="fw-bold mb-3">&#8377;<%= Number(l.price).toLocaleString("en-IN") %> <span class="text-muted small fw-normal">/ night</span></div>
+                                    <div class="d-flex gap-2">
+                                        <a href="/listings/<%= l._id %>" class="btn btn-sm btn-outline-dark rounded-pill flex-grow-1">View</a>
+                                        <a href="/listings/<%= l._id %>/edit" class="btn btn-sm btn-outline-secondary rounded-pill px-3">Edit</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Tab 3: Cab Bookings -->
+        <div class="tab-pane fade" id="cabs" role="tabpanel" aria-labelledby="cabs-tab">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0">Your Cab Transfers & Rides</h5>
+                <a href="/cabs/book" class="btn btn-warning rounded-pill px-3 py-1 btn-sm fw-semibold text-dark">
+                    <i class="fa-solid fa-plus me-1"></i> Book New Ride
+                </a>
+            </div>
+
+            <% if (myCabs.length === 0) { %>
+                <div class="text-center py-5 bg-white rounded-4 border">
+                    <i class="fa-solid fa-taxi fs-1 text-muted mb-3 d-block"></i>
+                    <h5 class="fw-bold">No cab bookings recorded</h5>
+                    <p class="text-muted small">Arrange convenient airport, hotel, or city transfers in minutes.</p>
+                    <a href="/cabs/book" class="btn btn-warning rounded-pill px-4 text-dark fw-semibold">Book a cab</a>
+                </div>
+            <% } else { %>
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    <% for (let cab of myCabs) { %>
+                        <div class="col">
+                            <div class="card border rounded-4 shadow-sm p-4 bg-white h-100">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-1 fw-bold">
+                                        <%= cab.cabType %>
+                                    </span>
+                                    <span class="badge <%= cab.status === 'Confirmed' ? 'bg-success' : 'bg-secondary' %> rounded-pill px-3 py-1">
+                                        <%= cab.status %>
+                                    </span>
+                                </div>
+
+                                <div class="my-3">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <i class="fa-solid fa-circle text-success small"></i>
+                                        <span class="small fw-semibold text-truncate"><strong>Pickup:</strong> <%= cab.pickupLocation %></span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2 mb-3">
+                                        <i class="fa-solid fa-location-dot text-danger small"></i>
+                                        <span class="small fw-semibold text-truncate"><strong>Dropoff:</strong> <%= cab.dropoffLocation %></span>
+                                    </div>
+                                    <div class="bg-light p-2 rounded-3 small border">
+                                        <div><strong>Date:</strong> <%= new Date(cab.travelDate).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }) %> at <%= cab.pickupTime %></div>
+                                        <div><strong>Passengers:</strong> <%= cab.passengers %> &middot; <strong>Code:</strong> <code><%= cab.bookingCode %></code></div>
+                                        <div><strong>Contact Phone:</strong> <%= cab.contactPhone %></div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-auto pt-2 border-top">
+                                    <div>
+                                        <span class="text-muted small">Fare:</span>
+                                        <span class="fw-bold text-dark fs-5">&#8377;<%= Number(cab.estimatedFare).toLocaleString("en-IN") %></span>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <a href="/cabs/<%= cab._id %>/confirmation" class="btn btn-outline-dark btn-sm rounded-pill px-3">Receipt</a>
+                                        <% if (cab.status === "Confirmed") { %>
+                                            <form method="POST" action="/cabs/<%= cab._id %>/cancel" onsubmit="return confirm('Cancel this ride?');">
+                                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">Cancel</button>
+                                            </form>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Tab 4: My Reviews -->
+        <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+            <% if (myReviews.length === 0) { %>
+                <div class="text-center py-5 bg-white rounded-4 border">
+                    <i class="fa-regular fa-star fs-1 text-muted mb-3 d-block"></i>
+                    <h5 class="fw-bold">No reviews written yet</h5>
+                    <p class="text-muted small">Leave honest feedback after your stays to help fellow travelers.</p>
+                </div>
+            <% } else { %>
+                <div class="row row-cols-1 row-cols-md-2 g-3">
+                    <% for (let r of myReviews) { %>
+                        <div class="col">
+                            <div class="card border rounded-4 shadow-sm p-3 bg-white h-100">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="badge bg-warning text-dark rounded-pill">
+                                        <i class="fa-solid fa-star"></i> <%= r.rating %> Stars
+                                    </span>
+                                    <span class="text-muted small">
+                                        <%= new Date(r.createdAt).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }) %>
+                                    </span>
+                                </div>
+                                <p class="card-text text-secondary small mb-3 flex-grow-1">
+                                    "<%= r.comment %>"
+                                </p>
+                            </div>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="editProfileModalLabel">Edit Profile Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/profile" method="POST">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Display Name</label>
+                        <input type="text" name="displayName" class="form-control rounded-3" value="<%= user.displayName || user.username %>" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Email Address</label>
+                        <input type="email" name="email" class="form-control rounded-3" value="<%= user.email || '' %>" required pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$" placeholder="name@example.com" />
+                        <div class="form-text">Used for booking receipts and account notifications.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Profile Avatar URL</label>
+                        <input type="url" name="avatar" class="form-control rounded-3" value="<%= user.avatar && !user.avatar.includes('photo-1535713875002') ? user.avatar : '' %>" placeholder="https://..." />
+                        <div class="form-text">Paste a custom image URL, or leave blank to automatically generate a colorful avatar based on your name.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Contact Phone</label>
+                        <input type="tel" name="phone" class="form-control rounded-3" value="<%= user.phone || '' %>" placeholder="+91 9876543210" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Bio / About You</label>
+                        <textarea name="bio" rows="3" class="form-control rounded-3" placeholder="Tell hosts and guests about yourself..."><%= user.bio || '' %></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-top">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 fw-semibold">Save Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
