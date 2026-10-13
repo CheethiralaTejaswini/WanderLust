@@ -77,15 +77,23 @@ module.exports.createBooking = async (req, res) => {
 
     await newBooking.save();
 
-    // Send confirmation email to guest
-    const emailResult = await sendBookingConfirmationEmail(newBooking, listing);
+    // Send confirmation email to guest with fail-safe non-blocking error handling
+    try {
+        const emailResult = await sendBookingConfirmationEmail(newBooking, listing);
 
-    if (emailResult && emailResult.previewUrl) {
-        newBooking.emailPreviewUrl = emailResult.previewUrl;
-        await newBooking.save();
-        req.flash("success", `Booking confirmed! Confirmation email dispatched for ${newBooking.guestEmail}. <a href="${emailResult.previewUrl}" target="_blank" class="fw-bold text-dark text-decoration-underline ms-1">View Sent Email &rarr;</a>`);
-    } else {
-        req.flash("success", `Booking confirmed! Confirmation email sent to ${newBooking.guestEmail}. Code: ${bookingCode}`);
+        if (emailResult && emailResult.previewUrl) {
+            newBooking.emailPreviewUrl = emailResult.previewUrl;
+            await newBooking.save();
+            req.flash("success", `Booking confirmed! Confirmation email dispatched for ${newBooking.guestEmail}. <a href="${emailResult.previewUrl}" target="_blank" class="fw-bold text-dark text-decoration-underline ms-1">View Sent Email &rarr;</a>`);
+        } else if (emailResult && emailResult.error) {
+            console.warn(`[BOOKING NOTICE] Reservation ${bookingCode} saved, but email dispatch failed: ${emailResult.error}`);
+            req.flash("success", `Booking confirmed! Confirmation Code: ${bookingCode}`);
+        } else {
+            req.flash("success", `Booking confirmed! Confirmation email sent to ${newBooking.guestEmail}. Code: ${bookingCode}`);
+        }
+    } catch (mailErr) {
+        console.error("[BOOKING EMAIL DISPATCH ERROR]:", mailErr.message);
+        req.flash("success", `Booking confirmed! Confirmation Code: ${bookingCode}`);
     }
     res.redirect(`/bookings/${newBooking._id}/confirmation`);
 };
@@ -165,18 +173,23 @@ module.exports.resendConfirmationEmail = async (req, res) => {
         return res.redirect("/bookings");
     }
 
-    const result = await sendBookingConfirmationEmail(booking, booking.listing);
+    try {
+        const result = await sendBookingConfirmationEmail(booking, booking.listing);
 
-    if (result && result.isLive) {
-        req.flash("success", `Confirmation email successfully delivered to ${booking.guestEmail}!`);
-    } else if (result && result.previewUrl) {
-        booking.emailPreviewUrl = result.previewUrl;
-        await booking.save();
-        req.flash("success", `Confirmation email sent for ${booking.guestEmail}! <a href="${result.previewUrl}" target="_blank" class="fw-bold text-dark text-decoration-underline ms-1">Click here to view your sent email &rarr;</a>`);
-    } else if (result && result.error) {
-        req.flash("error", `Failed to send email: ${result.error}`);
-    } else {
-        req.flash("success", `Confirmation email sent for ${booking.guestEmail}!`);
+        if (result && result.isLive) {
+            req.flash("success", `Confirmation email successfully delivered to ${booking.guestEmail}!`);
+        } else if (result && result.previewUrl) {
+            booking.emailPreviewUrl = result.previewUrl;
+            await booking.save();
+            req.flash("success", `Confirmation email sent for ${booking.guestEmail}! <a href="${result.previewUrl}" target="_blank" class="fw-bold text-dark text-decoration-underline ms-1">Click here to view your sent email &rarr;</a>`);
+        } else if (result && result.error) {
+            req.flash("error", `Could not send email: ${result.error}`);
+        } else {
+            req.flash("success", `Confirmation email sent for ${booking.guestEmail}!`);
+        }
+    } catch (mailErr) {
+        console.error("[RESEND EMAIL ERROR]:", mailErr.message);
+        req.flash("error", `Could not deliver confirmation email at this time: ${mailErr.message}`);
     }
 
     res.redirect(`/bookings/${booking._id}/confirmation`);

@@ -16,12 +16,18 @@ function createTransporter() {
     const pass = process.env.EMAIL_PASS;
 
     if (user && pass && user.trim() !== "" && pass.trim() !== "") {
+        const port = parseInt(process.env.EMAIL_PORT, 10) || 465;
         return nodemailer.createTransport({
-            service: process.env.EMAIL_SERVICE || "gmail",
+            host: process.env.EMAIL_HOST || "smtp.gmail.com",
+            port: port,
+            secure: port === 465, // true for port 465 (direct SSL), false for 587 (STARTTLS)
             auth: {
                 user: user.trim(),
                 pass: pass.trim().replace(/\s+/g, "")
-            }
+            },
+            connectionTimeout: 10000, // 10s connection timeout fail-safe
+            greetingTimeout: 10000,   // 10s greeting timeout fail-safe
+            socketTimeout: 15000      // 15s socket activity timeout fail-safe
         });
     }
 
