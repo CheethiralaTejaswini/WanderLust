@@ -24,11 +24,21 @@
 
                 <!-- Listing Overview -->
                 <div class="d-flex gap-3 align-items-center mb-4 p-3 bg-light rounded-4 border">
-                    <img src="<%= booking.listing.image && booking.listing.image.url ? booking.listing.image.url : 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80' %>"
-                         alt="<%= booking.listing.title %>" class="rounded-3 shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
+                    <% 
+                        let confListingImg = 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80';
+                        if (booking.listing && booking.listing.image) {
+                            if (typeof booking.listing.image === 'string' && booking.listing.image.trim()) {
+                                confListingImg = booking.listing.image;
+                            } else if (booking.listing.image.url && booking.listing.image.url.trim()) {
+                                confListingImg = booking.listing.image.url;
+                            }
+                        }
+                    %>
+                    <img src="<%= confListingImg %>"
+                         alt="<%= booking.listing ? booking.listing.title : 'Listing' %>" class="rounded-3 shadow-sm" style="width: 80px; height: 80px; object-fit: cover;">
                     <div class="overflow-hidden">
-                        <h6 class="fw-bold mb-1 text-truncate"><%= booking.listing.title %></h6>
-                        <p class="text-muted small mb-0 text-truncate"><i class="fa-solid fa-location-dot me-1 text-danger"></i> <%= booking.listing.location %>, <%= booking.listing.country %></p>
+                        <h6 class="fw-bold mb-1 text-truncate"><%= booking.listing ? booking.listing.title : 'Accommodation Stay' %></h6>
+                        <p class="text-muted small mb-0 text-truncate"><i class="fa-solid fa-location-dot me-1 text-danger"></i> <%= booking.listing ? (booking.listing.location + (booking.listing.country ? (', ' + booking.listing.country) : '')) : 'Reserved Stay' %></p>
                     </div>
                 </div>
 
@@ -140,9 +150,11 @@
                         </button>
                     </form>
 
-                    <a href="/cabs/book?listingId=<%= booking.listing._id %>" class="btn btn-warning rounded-pill py-2 fw-semibold text-dark shadow-sm">
-                        <i class="fa-solid fa-taxi me-1"></i> Need a Cab to this Stay?
-                    </a>
+                    <% if (booking.listing) { %>
+                        <a href="/cabs/book?listingId=<%= booking.listing._id %>" class="btn btn-warning rounded-pill py-2 fw-semibold text-dark shadow-sm">
+                            <i class="fa-solid fa-taxi me-1"></i> Need a Cab to this Stay?
+                        </a>
+                    <% } %>
                 </div>
 
                 <!-- Live Gmail Delivery Tip -->

@@ -139,8 +139,9 @@ const listingSchema = new Schema({
 listingSchema.virtual("avgRating").get(function () {
     if (!this.reviews || this.reviews.length === 0) return 0;
     // Check if reviews are populated objects
-    if (typeof this.reviews[0] === "object" && this.reviews[0].rating !== undefined) {
-        const sum = this.reviews.reduce((acc, r) => acc + (r.rating || 0), 0);
+    const firstReview = /** @type {any} */ (this.reviews[0]);
+    if (firstReview && typeof firstReview === "object" && firstReview.rating !== undefined) {
+        const sum = this.reviews.reduce((acc, r) => acc + ((/** @type {any} */ (r)).rating || 0), 0);
         return (sum / this.reviews.length).toFixed(1);
     }
     return 0;

@@ -15,7 +15,7 @@
 
             <% if (listing) { %>
                 <div class="p-3 bg-light rounded-4 mb-4 border d-flex align-items-center gap-3">
-                    <img src="<%= listing.image?.url || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80' %>"
+                    <img src="<%= (typeof listing.image === 'string' ? listing.image : listing.image?.url) || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80' %>"
                          alt="Listing" class="rounded-3 shadow-sm" style="width: 70px; height: 70px; object-fit: cover;">
                     <div>
                         <span class="text-muted small text-uppercase fw-semibold">Destination Stay</span>

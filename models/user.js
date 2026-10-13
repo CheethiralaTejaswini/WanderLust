@@ -5,6 +5,10 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const { generateNameAvatar, getAvatarUrl } = require("../utils/avatarHelper.js");
 
 const userSchema = new Schema({
+    username: {
+        type: String,
+        trim: true
+    },
     email: {
         type: String,
         required: true,
@@ -47,12 +51,11 @@ const userSchema = new Schema({
 });
 
 // Automatically enforce name-based avatar if avatar is missing or generic unsplash
-userSchema.pre("save", function(next) {
+userSchema.pre("save", function() {
     const name = this.displayName || this.username || "User";
     if (!this.avatar || this.avatar.includes("photo-1535713875002-d1d0cf377fde") || this.avatar.trim() === "") {
         this.avatar = generateNameAvatar(name);
     }
-    if (typeof next === "function") next();
 });
 
 userSchema.methods.getAvatar = function(size = 200) {

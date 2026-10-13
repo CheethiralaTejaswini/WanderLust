@@ -12,7 +12,7 @@
                 </span>
                 <span>&middot;</span>
                 <a href="#reviews-section" class="text-dark fw-semibold text-decoration-underline">
-                    <%= listing.reviews.length %> <%= listing.reviews.length === 1 ? 'review' : 'reviews' %>
+                    <%= (listing.reviews ? listing.reviews.length : 0) %> <%= (!listing.reviews || listing.reviews.length === 1) ? 'review' : 'reviews' %>
                 </a>
                 <span>&middot;</span>
                 <span class="badge bg-light text-dark border rounded-pill"><%= listing.category || 'Trending' %></span>
@@ -38,7 +38,7 @@
     <!-- Main Listing Image Showcase -->
     <div class="show-hero-image-wrapper mb-4 rounded-4 overflow-hidden position-relative shadow-sm">
         <img
-            src="<%= listing.image && listing.image.url ? listing.image.url : 'https://images.unsplash.com/photo-1625505826533-5c80aca7d157?auto=format&fit=crop&w=1200&q=80' %>"
+            src="<%= (typeof listing.image === 'string' && listing.image.trim()) ? listing.image : ((listing.image && listing.image.url) ? listing.image.url : 'https://images.unsplash.com/photo-1625505826533-5c80aca7d157?auto=format&fit=crop&w=1200&q=80') %>"
             class="img-fluid w-100 show-hero-img"
             alt="<%= listing.title %>"
         />
@@ -132,9 +132,10 @@
 
             <!-- Owner Controls -->
             <% 
-                const isListingOwner = currUser && listing.owner && (
-                    (listing.owner._id && currUser._id && listing.owner._id.toString() === currUser._id.toString()) ||
-                    (!listing.owner._id && currUser._id && listing.owner.toString() === currUser._id.toString())
+                const currentUser = (typeof currUser !== "undefined" && currUser) ? currUser : ((typeof user !== "undefined" && user) ? user : null);
+                const isListingOwner = currentUser && listing.owner && (
+                    (listing.owner._id && currentUser._id && listing.owner._id.toString() === currentUser._id.toString()) ||
+                    (!listing.owner._id && currentUser._id && listing.owner.toString() === currentUser._id.toString())
                 );
             %>
             <% if (isListingOwner) { %>
@@ -206,7 +207,7 @@
                 <p class="text-muted small mb-3">Discover recommended hotels, restaurants, and sights near this destination.</p>
 
                 <div class="row row-cols-1 row-cols-md-2 g-3">
-                    <% for (let place of nearbyPlaces) { %>
+                    <% for (let place of (typeof nearbyPlaces !== "undefined" && Array.isArray(nearbyPlaces) ? nearbyPlaces : [])) { %>
                         <div class="col">
                             <div class="card h-100 border rounded-4 p-3 shadow-sm nearby-place-card">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
@@ -259,12 +260,12 @@
                 <div class="d-flex align-items-baseline gap-2 mb-4">
                     <i class="fa-solid fa-star text-warning fs-4"></i>
                     <h4 class="fw-bold mb-0">
-                        <%= listing.avgRating > 0 ? listing.avgRating : 'No ratings yet' %> &middot; <%= listing.reviews.length %> <%= listing.reviews.length === 1 ? 'review' : 'reviews' %>
+                        <%= listing.avgRating > 0 ? listing.avgRating : 'No ratings yet' %> &middot; <%= listing.reviews ? listing.reviews.length : 0 %> <%= (!listing.reviews || listing.reviews.length === 1) ? 'review' : 'reviews' %>
                     </h4>
                 </div>
 
                 <!-- Review Submission Form (Authenticated Users) -->
-                <% if (currUser) { %>
+                <% if (currentUser) { %>
                     <div class="card border rounded-4 p-4 mb-4 shadow-sm bg-white">
                         <h5 class="fw-bold mb-3">Leave a Review</h5>
                         <form action="/listings/<%= listing._id %>/reviews" method="POST" novalidate class="needs-validation">
@@ -306,7 +307,7 @@
                 <% } %>
 
                 <!-- Review Cards Grid -->
-                <% if (listing.reviews.length === 0) { %>
+                <% if (!listing.reviews || listing.reviews.length === 0) { %>
                     <p class="text-muted">No reviews for this listing yet. Be the first to leave one!</p>
                 <% } else { %>
                     <div class="row row-cols-1 row-cols-md-2 g-3">
@@ -343,7 +344,13 @@
                                         <%= review.comment %>
                                     </p>
 
-                                    <% if (currUser && review.author && currUser._id.toString() === review.author._id.toString()) { %>
+                                    <% 
+                                        const isReviewAuthor = currentUser && review.author && (
+                                            (review.author._id && currentUser._id && review.author._id.toString() === currentUser._id.toString()) ||
+                                            (!review.author._id && currentUser._id && review.author.toString() === currentUser._id.toString())
+                                        );
+                                    %>
+                                    <% if (isReviewAuthor) { %>
                                         <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" class="mt-2 text-end">
                                             <button type="submit" class="btn btn-link text-danger p-0 small text-decoration-none" onclick="return confirm('Delete this review?');">
                                                 <i class="fa-regular fa-trash-can me-1"></i> Delete
@@ -371,7 +378,7 @@
                         <div class="small fw-semibold text-dark">
                             <i class="fa-solid fa-star text-warning"></i>
                             <%= listing.avgRating > 0 ? listing.avgRating : 'New' %> &middot;
-                            <span class="text-muted"><%= listing.reviews.length %> reviews</span>
+                            <span class="text-muted"><%= (listing.reviews ? listing.reviews.length : 0) %> reviews</span>
                         </div>
                     </div>
 
@@ -402,12 +409,12 @@
                         <!-- Guest Contact Fields -->
                         <div class="mb-3">
                             <label class="form-label small fw-semibold text-muted text-uppercase mb-1">Your Full Name</label>
-                            <input type="text" name="booking[guestName]" class="form-control rounded-3" value="<%= currUser ? (currUser.displayName || currUser.username) : '' %>" required placeholder="Full Name" />
+                            <input type="text" name="booking[guestName]" class="form-control rounded-3" value="<%= currentUser ? (currentUser.displayName || currentUser.username || '') : '' %>" required placeholder="Full Name" />
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label small fw-semibold text-muted text-uppercase mb-1">Email</label>
-                            <input type="email" name="booking[guestEmail]" class="form-control rounded-3" value="<%= currUser ? currUser.email : '' %>" required placeholder="name@example.com" pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$" title="Please provide a valid email address with a domain (e.g. name@example.com)" />
+                            <input type="email" name="booking[guestEmail]" class="form-control rounded-3" value="<%= currentUser ? (currentUser.email || '') : '' %>" required placeholder="name@example.com" pattern="^[^@\s]+@[^@\s]+\.[^@\s]+$" title="Please provide a valid email address with a domain (e.g. name@example.com)" />
                         </div>
 
                         <div class="mb-3">
@@ -440,7 +447,7 @@
                         </div>
 
                         <!-- Submit Button -->
-                        <% if (currUser) { %>
+                        <% if (currentUser) { %>
                             <button type="submit" class="btn btn-danger w-100 rounded-3 py-3 fw-bold fs-5 shadow-sm reserve-btn">
                                 Reserve Listing
                             </button>
@@ -473,6 +480,17 @@
      data-service-fee="<%= Math.round(listing.price * 0.08) + 150 %>"
      data-destination="<%= encodeURIComponent(listing.location + ', ' + listing.country) %>">
 </div>
+
+<script id="listingMapData" type="application/json">
+<%- JSON.stringify({
+    lat: Number(listing.coordinates?.lat || (listing.geometry?.coordinates && listing.geometry.coordinates[1]) || 28.6139) || 28.6139,
+    lng: Number(listing.coordinates?.lng || (listing.geometry?.coordinates && listing.geometry.coordinates[0]) || 77.2090) || 77.2090,
+    title: listing.title || "Listing",
+    location: (listing.location ? listing.location + ", " : "") + (listing.country || ""),
+    image: (typeof listing.image === "string" && listing.image.trim()) ? listing.image : ((listing.image && listing.image.url) ? listing.image.url : "https://images.unsplash.com/photo-1625505826533-5c80aca7d157?auto=format&fit=crop&w=800&q=60"),
+    price: Number(listing.price || 0)
+}) %>
+</script>
 
 <script>
     // Set default check-in and check-out dates
@@ -534,12 +552,14 @@
         // ==========================================
         // Interactive Leaflet Map Initialization
         // ==========================================
-        const listingLat = Number("<%= Number(listing.coordinates?.lat || (listing.geometry?.coordinates && listing.geometry.coordinates[1]) || 28.6139) %>") || 28.6139;
-        const listingLng = Number("<%= Number(listing.coordinates?.lng || (listing.geometry?.coordinates && listing.geometry.coordinates[0]) || 77.2090) %>") || 77.2090;
-        const listingTitle = <%- JSON.stringify(listing.title || "Listing") %>;
-        const listingLocation = <%- JSON.stringify((listing.location ? listing.location + ", " : "") + (listing.country || "")) %>;
-        const listingImage = <%- JSON.stringify(listing.image?.url || "https://images.unsplash.com/photo-1625505826533-5c80aca7d157?auto=format&fit=crop&w=800&q=60") %>;
-        const listingPrice = <%= Number(listing.price || 0) %>;
+        const mapDataEl = document.getElementById("listingMapData");
+        const mapData = mapDataEl ? JSON.parse(mapDataEl.textContent || "{}") : {};
+        const listingLat = Number(mapData.lat) || 28.6139;
+        const listingLng = Number(mapData.lng) || 77.2090;
+        const listingTitle = mapData.title || "Listing";
+        const listingLocation = mapData.location || "";
+        const listingImage = mapData.image || "https://images.unsplash.com/photo-1625505826533-5c80aca7d157?auto=format&fit=crop&w=800&q=60";
+        const listingPrice = Number(mapData.price || 0);
 
         const mapContainer = document.getElementById("leafletMap");
         if (mapContainer && typeof L !== "undefined") {

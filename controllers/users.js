@@ -33,7 +33,7 @@ module.exports.signup = async (req, res, next) => {
             avatar: generateNameAvatar(name)
         });
 
-        const registeredUser = await User.register(newUser, password);
+        const registeredUser = await /** @type {any} */ (User).register(newUser, password);
 
         req.login(registeredUser, (err) => {
             if (err) {

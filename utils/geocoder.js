@@ -125,6 +125,7 @@ async function getNearbyPlaces(lat, lng, destinationName = "Destination") {
     if (apiKey && apiKey.trim() !== "") {
         try {
             const types = ["lodging", "restaurant", "tourist_attraction"];
+            /** @type {Record<string, any[]>} */
             const results = {};
 
             for (const type of types) {

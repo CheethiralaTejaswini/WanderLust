@@ -55,7 +55,11 @@ module.exports.isOwner = async (req, res, next) => {
         return res.redirect("/listings");
     }
 
-    if (!listing.owner || !listing.owner.equals(req.user._id)) {
+    const ownerId = listing.owner?._id ? listing.owner._id.toString() : (listing.owner ? listing.owner.toString() : null);
+    const userId = req.user._id.toString();
+    const isAdmin = req.user.role === "admin";
+
+    if (!isAdmin && (!ownerId || ownerId !== userId)) {
         req.flash("error", "You don't have permission to edit or delete this listing!");
         return res.redirect(`/listings/${id}`);
     }
@@ -81,7 +85,8 @@ module.exports.validateReview = (req, res, next) => {
     let { error } = reviewSchema.validate(req.body);
     if (error) {
         let errMsg = error.details.map((el) => el.message).join(", ");
-        throw new ExpressError(400, errMsg);
+        req.flash("error", errMsg);
+        return res.redirect(`/listings/${req.params.id || ""}`);
     } else {
         next();
     }
@@ -105,7 +110,8 @@ module.exports.validateCabBooking = (req, res, next) => {
     let { error } = cabBookingSchema.validate(req.body);
     if (error) {
         let errMsg = error.details.map((el) => el.message).join(", ");
-        throw new ExpressError(400, errMsg);
+        req.flash("error", errMsg);
+        return res.redirect("/cabs/book");
     } else {
         next();
     }
@@ -115,7 +121,8 @@ module.exports.validateFeedback = (req, res, next) => {
     let { error } = feedbackSchema.validate(req.body);
     if (error) {
         let errMsg = error.details.map((el) => el.message).join(", ");
-        throw new ExpressError(400, errMsg);
+        req.flash("error", errMsg);
+        return res.redirect("/feedback");
     } else {
         next();
     }
@@ -136,12 +143,11 @@ module.exports.isreviewAuthor = async (req, res, next) => {
         return res.redirect(`/listings/${id}`);
     }
 
-    if (!review.author) {
-        req.flash("error", "This review has no author!");
-        return res.redirect(`/listings/${id}`);
-    }
+    const authorId = review.author?._id ? review.author._id.toString() : (review.author ? review.author.toString() : null);
+    const userId = req.user._id.toString();
+    const isAdmin = req.user.role === "admin";
 
-    if (!review.author.equals(req.user._id)) {
+    if (!isAdmin && (!authorId || authorId !== userId)) {
         req.flash("error", "You don't have permission to delete this review!");
         return res.redirect(`/listings/${id}`);
     }

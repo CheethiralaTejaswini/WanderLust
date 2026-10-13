@@ -6,6 +6,7 @@ const { sendCabConfirmationEmail } = require("../utils/mailer.js");
 
 module.exports.renderCabBookingForm = async (req, res) => {
     const { listingId, pickup, destination } = req.query;
+    /** @type {any} */
     let listing = null;
     let targetDestination = destination || "";
 

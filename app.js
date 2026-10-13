@@ -27,8 +27,12 @@ const bookingsRouter = require("./routes/booking.js");
 const cabsRouter = require("./routes/cab.js");
 const feedbackRouter = require("./routes/feedback.js");
 
-const MONGO_URL = process.env.MONGO_URL || "mongodb://127.0.0.1:27017/wanderlust";
-const SECRET = process.env.SECRET || "wanderlust_default_secret_key_2026_xyz";
+let rawMongoUrl = (process.env.MONGO_URL || process.env.ATLASDB_URL || "mongodb://127.0.0.1:27017/wanderlust").trim();
+if (rawMongoUrl.startsWith("MONGO_URL=")) {
+    rawMongoUrl = rawMongoUrl.replace(/^MONGO_URL=/, "").trim();
+}
+const MONGO_URL = rawMongoUrl;
+const SECRET = (process.env.SECRET || "wanderlust_default_secret_key_2026_xyz").trim();
 const PORT = process.env.PORT || 8080;
 
 // Connect to MongoDB
@@ -43,6 +47,9 @@ main()
 async function main() {
     await mongoose.connect(MONGO_URL);
 }
+
+// Trust reverse proxy (essential for Render HTTPS, secure cookies, and OAuth callbacks)
+app.set("trust proxy", 1);
 
 // View engine setup
 app.set("view engine", "ejs");
@@ -65,7 +72,7 @@ const store = MongoStore.create({
     touchAfter: 24 * 3600,
 });
 
-store.on("error", (err) => {
+/** @type {any} */ (store).on("error", (err) => {
     console.error("Session Store Error:", err);
 });
 
@@ -103,7 +110,7 @@ passport.use(
             if (!user) {
                 return done(null, false, { message: "No account found with that username or email." });
             }
-            const authResult = await user.authenticate(password);
+            const authResult = await /** @type {any} */ (user).authenticate(password);
             if (authResult.error) {
                 return done(null, false, { message: authResult.error.message || "Incorrect password." });
             }
@@ -130,7 +137,8 @@ if (hasGoogleOAuth) {
             {
                 clientID: process.env.GOOGLE_CLIENT_ID,
                 clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-                callbackURL: process.env.GOOGLE_CALLBACK_URL || "/auth/google/callback"
+                callbackURL: process.env.GOOGLE_CALLBACK_URL || "/auth/google/callback",
+                proxy: true
             },
             async (accessToken, refreshToken, profile, done) => {
                 try {
@@ -212,6 +220,7 @@ const { getAvatarUrl, getNameColor, getInitials, generateNameAvatar } = require(
 
 app.use((req, res, next) => {
     res.locals.currUser = req.user || null;
+    res.locals.currentUser = req.user || null;
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     res.locals.googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY || "";

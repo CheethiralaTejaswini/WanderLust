@@ -36,7 +36,7 @@ async function parseExcelFile(filePath) {
     let headers = [];
 
     worksheet.eachRow((row, rowNumber) => {
-        const values = row.values;
+        const values = Array.isArray(row.values) ? row.values : Object.values(row.values || {});
         if (rowNumber === 1) {
             // Header row (ExcelJS uses 1-based indexing, values[0] is undefined)
             headers = values.slice(1).map(h => (h !== undefined && h !== null ? String(h).trim() : ""));
@@ -50,10 +50,11 @@ async function parseExcelFile(filePath) {
                     let cellVal = "";
                     if (rawVal !== undefined && rawVal !== null) {
                         if (typeof rawVal === "object") {
-                            if (rawVal.result !== undefined) {
-                                cellVal = String(rawVal.result);
-                            } else if (rawVal.text !== undefined) {
-                                cellVal = String(rawVal.text);
+                            const objVal = /** @type {any} */ (rawVal);
+                            if (objVal.result !== undefined) {
+                                cellVal = String(objVal.result);
+                            } else if (objVal.text !== undefined) {
+                                cellVal = String(objVal.text);
                             } else {
                                 cellVal = String(rawVal);
                             }

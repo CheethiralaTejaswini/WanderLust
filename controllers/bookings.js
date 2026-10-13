@@ -39,14 +39,14 @@ module.exports.createBooking = async (req, res) => {
     }
 
     // Availability check
-    const isAvailable = await Booking.isAvailable(id, checkInDate, checkOutDate);
+    const isAvailable = await /** @type {any} */ (Booking).isAvailable(id, checkInDate, checkOutDate);
     if (!isAvailable) {
         req.flash("error", "Sorry, this listing is already reserved for the selected dates. Please choose different dates.");
         return res.redirect(`/listings/${id}`);
     }
 
     // Calculate nights & pricing
-    const diffTime = Math.abs(checkOutDate - checkInDate);
+    const diffTime = Math.abs(checkOutDate.getTime() - checkInDate.getTime());
     const totalNights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     const nightlyPrice = listing.price;
     const cleaningFee = Math.round(nightlyPrice * 0.05) + 200;
@@ -102,10 +102,14 @@ module.exports.showConfirmation = async (req, res) => {
     }
 
     // Ensure only the booker or host can view this confirmation
-    const isBooker = booking.user && booking.user._id && booking.user._id.equals(req.user._id);
-    const isHost = booking.listing && booking.listing.owner && (
-        (booking.listing.owner._id && booking.listing.owner._id.equals(req.user._id)) ||
-        (typeof booking.listing.owner.equals === "function" && booking.listing.owner.equals(req.user._id))
+    const isBooker = booking.user && (
+        (booking.user._id && booking.user._id.equals(req.user._id)) ||
+        (typeof booking.user.equals === "function" && booking.user.equals(req.user._id))
+    );
+    const hostUser = /** @type {any} */ (booking.listing)?.owner;
+    const isHost = hostUser && (
+        (hostUser._id && hostUser._id.equals(req.user._id)) ||
+        (typeof hostUser.equals === "function" && hostUser.equals(req.user._id))
     );
 
     if (!isBooker && !isHost) {
@@ -148,7 +152,8 @@ module.exports.cancelBooking = async (req, res) => {
     await booking.save();
 
     req.flash("success", "Your reservation has been cancelled.");
-    res.redirect("/profile");
+    const referer = req.get("Referrer") || "/bookings";
+    res.redirect(referer);
 };
 
 module.exports.resendConfirmationEmail = async (req, res) => {

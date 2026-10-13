@@ -36,8 +36,8 @@ async function sendBookingConfirmationEmail(booking, listing) {
     try {
         const recipientEmail = booking.guestEmail || "traveler@example.com";
         const guestName = booking.guestName || "Traveler";
-        const listingTitle = listing.title || "Vacation Stay";
-        const listingLocation = `${listing.location}, ${listing.country}`;
+        const listingTitle = (listing && listing.title) ? listing.title : "Vacation Stay";
+        const listingLocation = listing ? `${listing.location || ''}, ${listing.country || ''}` : "Stay Location";
         const checkInFormatted = new Date(booking.checkIn).toLocaleDateString("en-IN", {
             weekday: "short",
             month: "short",
@@ -50,6 +50,7 @@ async function sendBookingConfirmationEmail(booking, listing) {
             day: "numeric",
             year: "numeric"
         });
+        const baseUrl = process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || "http://localhost:8080";
 
         const htmlContent = `
         <!DOCTYPE html>
@@ -135,7 +136,7 @@ async function sendBookingConfirmationEmail(booking, listing) {
                         </div>
                     </div>
 
-                    <a href="http://localhost:8080/bookings/${booking._id}/confirmation" class="btn">View Reservation Voucher</a>
+                    <a href="${baseUrl}/bookings/${booking._id}/confirmation" class="btn">View Reservation Voucher</a>
                 </div>
                 <div class="footer">
                     <p style="margin: 0;">&copy; ${new Date().getFullYear()} Wanderlust, Inc. Need help? Visit our Help Center.</p>

@@ -50,10 +50,22 @@ router.post("/auth/google/direct-login", wrapAsync(userController.directGoogleLo
 
 // Google OAuth Live Callback Route
 router.get("/auth/google/callback",
-    passport.authenticate("google", {
-        failureRedirect: "/login",
-        failureFlash: "Failed to authenticate with Google."
-    }),
+    (req, res, next) => {
+        const hasLiveKeys = !!(
+            process.env.GOOGLE_CLIENT_ID &&
+            process.env.GOOGLE_CLIENT_SECRET &&
+            process.env.GOOGLE_CLIENT_ID.trim() !== "" &&
+            process.env.GOOGLE_CLIENT_ID !== "your_google_client_id_here"
+        );
+        if (!hasLiveKeys) {
+            req.flash("error", "Google OAuth credentials are not configured in .env.");
+            return res.redirect("/login");
+        }
+        passport.authenticate("google", {
+            failureRedirect: "/login",
+            failureFlash: "Failed to authenticate with Google."
+        })(req, res, next);
+    },
     userController.googleAuthCallback
 );
 

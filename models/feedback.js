@@ -21,6 +21,11 @@ const feedbackSchema = new Schema({
         enum: ["General Suggestion", "Bug Report", "Feature Request", "Booking Support", "Host Inquiry"],
         default: "General Suggestion"
     },
+    subject: {
+        type: String,
+        required: true,
+        trim: true
+    },
     message: {
         type: String,
         required: true

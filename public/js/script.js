@@ -5,7 +5,7 @@
     const forms = document.querySelectorAll('.needs-validation');
     Array.from(forms).forEach(form => {
         form.addEventListener('submit', event => {
-            if (!form.checkValidity()) {
+            if (form instanceof HTMLFormElement && !form.checkValidity()) {
                 event.preventDefault();
                 event.stopPropagation();
             }
@@ -15,7 +15,7 @@
 
     // 2. Tax Switcher (Airbnb style: toggle before / after taxes)
     const taxSwitch = document.getElementById('taxSwitch');
-    if (taxSwitch) {
+    if (taxSwitch && taxSwitch instanceof HTMLInputElement) {
         taxSwitch.addEventListener('change', () => {
             const isTaxesOn = taxSwitch.checked;
             const priceDisplays = document.querySelectorAll('.price-display');
@@ -47,8 +47,12 @@
     const alerts = document.querySelectorAll('.modern-alert');
     alerts.forEach(alert => {
         setTimeout(() => {
-            const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-            if (bsAlert) bsAlert.close();
+            // @ts-ignore
+            const bs = window.bootstrap || (typeof bootstrap !== 'undefined' ? bootstrap : null);
+            if (bs && bs.Alert) {
+                const bsAlert = bs.Alert.getOrCreateInstance(alert);
+                if (bsAlert) bsAlert.close();
+            }
         }, 5000);
     });
 
@@ -57,7 +61,7 @@
     cabCards.forEach(card => {
         card.addEventListener('click', () => {
             const radio = card.querySelector('input[type="radio"]');
-            if (radio) {
+            if (radio && radio instanceof HTMLInputElement) {
                 radio.checked = true;
                 cabCards.forEach(c => c.classList.remove('selected-cab'));
                 card.classList.add('selected-cab');
@@ -68,7 +72,7 @@
 
     // 5. Scroll active category into view
     const activeCategory = document.querySelector('.active-category');
-    if (activeCategory && activeCategory.parentElement) {
+    if (activeCategory && activeCategory instanceof HTMLElement && activeCategory.parentElement) {
         activeCategory.parentElement.scrollTo({
             left: activeCategory.offsetLeft - 80,
             behavior: 'smooth'

@@ -3,18 +3,22 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
+const cloudName = process.env.CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME;
+const apiKey = process.env.CLOUD_API_KEY || process.env.CLOUDINARY_API_KEY;
+const apiSecret = process.env.CLOUD_API_SECRET || process.env.CLOUDINARY_API_SECRET;
+
 cloudinary.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.CLOUD_API_KEY,
-    api_secret: process.env.CLOUD_API_SECRET,
+    cloud_name: cloudName,
+    api_key: apiKey,
+    api_secret: apiSecret,
 });
 
 const isCloudinaryConfigured = !!(
-    process.env.CLOUD_NAME &&
-    process.env.CLOUD_API_KEY &&
-    process.env.CLOUD_API_SECRET &&
-    process.env.CLOUD_NAME !== "your_cloudinary_cloud_name" &&
-    process.env.CLOUD_NAME !== "moderation" // "moderation" was an invalid placeholder in .env causing 401
+    cloudName &&
+    apiKey &&
+    apiSecret &&
+    cloudName !== "your_cloudinary_cloud_name" &&
+    cloudName !== "moderation"
 );
 
 const uploadDir = path.join(__dirname, "uploads");

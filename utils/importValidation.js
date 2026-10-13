@@ -198,7 +198,9 @@ function validateListingRow(rawRow, rowIndex) {
     // 10. Coordinates (optional)
     const latRaw = getFieldValue(rawRow, ["latitude", "lat"]);
     const lngRaw = getFieldValue(rawRow, ["longitude", "lng", "lon", "long"]);
+    /** @type {number | null} */
     let lat = null;
+    /** @type {number | null} */
     let lng = null;
 
     if (latRaw && lngRaw) {
